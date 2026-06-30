@@ -1,0 +1,6 @@
+[submodule "components/HX-Workflows"]
+	path = components/HX-Workflows
+	url = https://github.com/HengXin666/HX-Workflows.git
+[submodule "components/HXLoLi-NaGaMe"]
+	path = components/HXLoLi-NaGaMe
+	url = https://github.com/HengXin666/HXLoLi-NaGaMe.git
