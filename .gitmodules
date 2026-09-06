@@ -4,3 +4,6 @@
 [submodule "components/HXLoLi-NaGaMe"]
 	path = components/HXLoLi-NaGaMe
 	url = https://github.com/HengXin666/HXLoLi-NaGaMe.git
+[submodule "components/HX-Memory"]
+	path = components/HX-Memory
+	url = https://github.com/HengXin666/HX-Memory.git
