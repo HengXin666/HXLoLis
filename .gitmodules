@@ -7,3 +7,6 @@
 [submodule "components/HX-Memory"]
 	path = components/HX-Memory
 	url = https://github.com/HengXin666/HX-Memory.git
+[submodule "components/HX-UI"]
+	path = components/HX-UI
+	url = https://github.com/HengXin666/HX-UI.git
