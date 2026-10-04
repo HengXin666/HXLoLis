@@ -6,7 +6,15 @@
  * 放在库里会有意无意地摸到内部, 而那不能证明什么。
  */
 
-export { createDshRegistry, NODES, type SourcedNodeTypeDef } from "./dsh/nodes";
+// ── 架构层 (主推): 根图 10 个大步骤 + 可进入的子图 ──
+export { createDshRegistry, ROOT_INPUT, SUBGRAPHS, STAGE_LIST } from "./dsh/architecture";
+export { buildRootGraph, type BuiltDsh } from "./dsh/build";
+export { DshArchitectureDemo } from "./DshArchitectureDemo";
+
+// ── 源码层 (旧版): 60 个节点对应源码控制流, 用于逐条核对 ──
+export { createSourceRegistry, NODES, type SourcedNodeTypeDef } from "./dsh/nodes";
 export { dshAgentLoopGraph, COLLAPSIBLE_GROUPS } from "./dsh/graph";
 export { DshDemo, OtherDomainDemo } from "./DshDemo";
+
+// ── Agent API ──
 export { AgentApiDemo } from "./AgentApiDemo";

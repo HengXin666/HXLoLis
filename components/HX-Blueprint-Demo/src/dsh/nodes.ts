@@ -410,7 +410,7 @@ export const NODES: Record<string, SourcedNodeTypeDef> = {
 };
 
 /** 建 dsh 演示用的注册中心。 */
-export function createDshRegistry(): BlueprintRegistryImpl {
+export function createSourceRegistry(): BlueprintRegistryImpl {
   const reg = createRegistry();
 
   // 自定义数据类型: 比内置那几个更能表达 agent loop 里的东西

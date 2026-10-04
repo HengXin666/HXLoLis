@@ -7,7 +7,7 @@ import {
   validateGraph, Badge, Button, Card, CardContent, CardHeader, CardTitle,
   cn, type BlueprintGraph,
 } from "@hx/ui";
-import { createDshRegistry } from "@hx/blueprint-demo";
+import { createDshRegistry } from "./dsh/architecture";
 
 /**
  * 演示: Agent 用**不给坐标**的描述建图, 出来的是人类能看的图。

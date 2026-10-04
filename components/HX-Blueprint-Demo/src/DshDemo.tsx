@@ -15,12 +15,12 @@ import {
  */
 import type { BlueprintGraph } from "@hx/ui";
 import { useBlueprint, useSelection, validateGraph, canConnect, SyncChannel, graphToHash } from "@hx/ui";
-import { createDshRegistry, NODES } from "./dsh/nodes";
+import { createSourceRegistry, NODES } from "./dsh/nodes";
 import { dshAgentLoopGraph, COLLAPSIBLE_GROUPS } from "./dsh/graph";
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, cn } from "@hx/ui";
 
 export function DshDemo(): JSX.Element {
-  const registry = useMemo(() => createDshRegistry(), []);
+  const registry = useMemo(() => createSourceRegistry(), []);
   const api = useBlueprint({ registry, defaultValue: dshAgentLoopGraph });
   const sel = useSelection();
   const [showAdd, setShowAdd] = useState(false);
@@ -117,7 +117,7 @@ export function DshDemo(): JSX.Element {
 }
 
 /** 现场演示"加一个节点 = 加一行"。 */
-function HowToExtend({ registry }: { readonly registry: ReturnType<typeof createDshRegistry> }): JSX.Element {
+function HowToExtend({ registry }: { readonly registry: ReturnType<typeof createSourceRegistry> }): JSX.Element {
   const [added, setAdded] = useState(false);
   const [verdict, setVerdict] = useState<string>("");
 
