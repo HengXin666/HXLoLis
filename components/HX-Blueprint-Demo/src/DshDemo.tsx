@@ -52,11 +52,15 @@ export function DshDemo(): JSX.Element {
     syncRef.current?.publish(api.graph);
   }, [api.graph]);
 
-  /** 打开独立整页画布。把当前图内联进 URL, 免得那边先白一下。 */
-  const openStandalone = () => {
+  /**
+   * 独立整页画布的 URL。
+   *
+   * 每次渲染时算, 把当前图内联进去 —— 那边打开就有内容, 不用等同步。
+   * (原来是 window.open, 会被弹窗拦截器拦掉, 用户点了毫无反应。)
+   */
+  const standaloneHref = () => {
     const enc = graphToHash(api.graph);
-    const url = "/blueprint.html#src=dsh&channel=hx-blueprint-dsh" + (enc ? `&graph=${enc}` : "");
-    window.open(url, "_blank", "noopener");
+    return "/blueprint.html#src=dsh&channel=hx-blueprint-dsh" + (enc ? `&graph=${enc}` : "");
   };
 
   return (
@@ -104,7 +108,7 @@ export function DshDemo(): JSX.Element {
         onChange={(g) => api.replace(g)}
         height={620}
         showIssues={false}
-        onOpenStandalone={openStandalone}
+        standaloneHref={standaloneHref()}
       />
 
       <div className="text-[11px] leading-relaxed text-muted-foreground">
