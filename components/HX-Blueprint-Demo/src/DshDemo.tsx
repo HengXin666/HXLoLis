@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type JSX } from "react";
+import { useEffect, useMemo, useRef, useState, type JSX } from "react";
 import {
   BlueprintEditor, BlueprintCanvas,
   createDemoRegistry, demoGraph,
@@ -14,7 +14,7 @@ import {
  * 如果这里能跑, 说明拓展点开对了。
  */
 import type { BlueprintGraph } from "@hx/ui";
-import { useBlueprint, useSelection, validateGraph, canConnect } from "@hx/ui";
+import { useBlueprint, useSelection, validateGraph, canConnect, SyncChannel, graphToHash } from "@hx/ui";
 import { createDshRegistry, NODES } from "./dsh/nodes";
 import { dshAgentLoopGraph, COLLAPSIBLE_GROUPS } from "./dsh/graph";
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, cn } from "@hx/ui";
@@ -27,6 +27,37 @@ export function DshDemo(): JSX.Element {
 
   const v = api.validation;
   const errors = v.issues.filter((i) => i.level === "error");
+
+  /**
+   * 与独立页面同步。
+   *
+   * 频道名带 source 标识 —— dsh 那张图和 demo 那张图不该互相覆盖。
+   * 用 ref 读最新图: onRequest 是构造时注册的, 闭包会读到旧值。
+   */
+  const graphRef = useRef(api.graph);
+  graphRef.current = api.graph;
+  const syncRef = useRef<SyncChannel | null>(null);
+  useEffect(() => {
+    const sync = new SyncChannel({
+      channel: "hx-blueprint-dsh",
+      onRemote: (g) => api.replace(g),
+      onRequest: () => graphRef.current,
+    });
+    syncRef.current = sync;
+    return () => { sync.close(); syncRef.current = null; };
+  }, [api]);
+
+  // 本地改动 -> 广播
+  useEffect(() => {
+    syncRef.current?.publish(api.graph);
+  }, [api.graph]);
+
+  /** 打开独立整页画布。把当前图内联进 URL, 免得那边先白一下。 */
+  const openStandalone = () => {
+    const enc = graphToHash(api.graph);
+    const url = "/blueprint.html#src=dsh&channel=hx-blueprint-dsh" + (enc ? `&graph=${enc}` : "");
+    window.open(url, "_blank", "noopener");
+  };
 
   return (
     <div className="space-y-3">
@@ -73,6 +104,7 @@ export function DshDemo(): JSX.Element {
         onChange={(g) => api.replace(g)}
         height={620}
         showIssues={false}
+        onOpenStandalone={openStandalone}
       />
 
       <div className="text-[11px] leading-relaxed text-muted-foreground">

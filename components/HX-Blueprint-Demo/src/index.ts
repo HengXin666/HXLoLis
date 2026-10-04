@@ -9,3 +9,4 @@
 export { createDshRegistry, NODES, type SourcedNodeTypeDef } from "./dsh/nodes";
 export { dshAgentLoopGraph, COLLAPSIBLE_GROUPS } from "./dsh/graph";
 export { DshDemo, OtherDomainDemo } from "./DshDemo";
+export { AgentApiDemo } from "./AgentApiDemo";
