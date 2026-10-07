@@ -1,0 +1,21 @@
+name: Feature request
+description: Describe a problem and the desired behavior
+body:
+    - type: textarea
+      id: problem
+      attributes:
+          label: Problem and affected users
+      validations:
+          required: true
+    - type: textarea
+      id: behavior
+      attributes:
+          label: Desired behavior and acceptance examples
+      validations:
+          required: true
+    - type: textarea
+      id: boundaries
+      attributes:
+          label: Scope, constraints and alternatives
+      validations:
+          required: true

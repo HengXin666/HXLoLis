@@ -1,0 +1,25 @@
+[
+    {
+        "id": "HC-FORMAT",
+        "status": "implemented",
+        "severity": "error",
+        "checker": ["node", "scripts/quality/check.ts", "--rule", "HC-FORMAT"],
+        "checkpoints": ["task-complete", "pre-commit", "pre-push", "ci-code"],
+        "probes": {
+            "positive": "tests/quality/format/valid.ts",
+            "negative": "tests/quality/format/invalid.txt"
+        },
+        "evidence": "reports/quality/format-probes.json"
+    },
+    {
+        "id": "HC-CI",
+        "status": "not-applicable",
+        "reason": "Example project is hosted outside GitHub",
+        "evidence": "git remote -v records the actual hosting provider"
+    },
+    {
+        "id": "HC-TYPE",
+        "status": "blocked",
+        "reason": "Example awaits a type checker decision"
+    }
+]

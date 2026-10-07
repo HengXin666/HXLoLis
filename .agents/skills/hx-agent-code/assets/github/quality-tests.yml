@@ -1,0 +1,40 @@
+name: quality-tests
+on:
+    workflow_call:
+        inputs:
+            artifact-name:
+                required: true
+                type: string
+permissions:
+    contents: read
+jobs:
+    tests:
+        runs-on: ubuntu-latest
+        timeout-minutes: 60
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                  persist-credentials: false
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '24'
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: '10'
+            - uses: astral-sh/setup-uv@v6
+            - name: Download the current run's build
+              uses: actions/download-artifact@v4
+              with:
+                  name: ${{ inputs.artifact-name }}
+                  path: .hx-quality/build/
+            - name: Run affected push tests or every PR test
+              run: node .agents/skills/hx-agent-code/scripts/ci.ts tests
+            - name: Upload test plan and all findings
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: quality-tests-${{ github.run_id }}-${{ github.run_attempt }}
+                  path: .hx-quality/reports/
+                  include-hidden-files: true

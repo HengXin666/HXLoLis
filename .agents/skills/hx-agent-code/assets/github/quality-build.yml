@@ -1,0 +1,84 @@
+name: quality-build
+on:
+    push:
+    pull_request:
+permissions:
+    contents: read
+jobs:
+    build:
+        if: github.event.deleted != true
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                  persist-credentials: false
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '24'
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: '10'
+            - uses: astral-sh/setup-uv@v6
+            - name: Build once and seal this source tree's output
+              run: node .agents/skills/hx-agent-code/scripts/ci.ts build
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: quality-build-${{ github.run_id }}-${{ github.run_attempt }}
+                  path: .hx-quality/build/
+                  include-hidden-files: true
+                  if-no-files-found: error
+            - name: Upload build report
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: quality-build-report-${{ github.run_id }}-${{ github.run_attempt }}
+                  path: .hx-quality/reports/
+                  include-hidden-files: true
+    compatibility:
+        if: github.event.deleted != true
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                  persist-credentials: false
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '24'
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: '10'
+            - uses: astral-sh/setup-uv@v6
+            - name: Check deployment and upgrade compatibility
+              run: node .agents/skills/hx-agent-code/scripts/ci.ts compatibility
+            - name: Upload compatibility report
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: quality-compatibility-${{ github.run_id }}-${{ github.run_attempt }}
+                  path: .hx-quality/reports/
+                  include-hidden-files: true
+    tests:
+        needs: build
+        uses: ./.github/workflows/quality-tests.yml
+        with:
+            artifact-name: quality-build-${{ github.run_id }}-${{ github.run_attempt }}
+    result:
+        if: always() && github.event.deleted != true
+        needs: [build, compatibility, tests]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Fail if any required group failed or was blocked
+              env:
+                  BUILD_RESULT: ${{ needs.build.result }}
+                  COMPATIBILITY_RESULT: ${{ needs.compatibility.result }}
+                  TEST_RESULT: ${{ needs.tests.result }}
+              run: |
+                  test "$BUILD_RESULT" = success
+                  test "$COMPATIBILITY_RESULT" = success
+                  test "$TEST_RESULT" = success

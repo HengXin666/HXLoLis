@@ -1,0 +1,6 @@
+interface:
+  display_name: "HX Agent Code"
+  short_description: "按项目安装代码质量红线, Diff 测试选择与元门禁"
+  default_prompt: "使用 $hx-agent-code 为当前项目完成代码质量红线安装与验证"
+policy:
+  allow_implicit_invocation: false

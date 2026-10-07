@@ -1,0 +1,170 @@
+{
+  "version": 1,
+  "source": "weuinevolveweb snapshot 2026-10-02 @ 79c9a5b (claims from supplied source, not runtime-verified)",
+  "sources": [
+    {
+      "path": "assets/source/README.md",
+      "sha256": "8b350a3b818a81fa58e63462191aebb54bf7e60ad6e31a40f2f8fd4b2f9b949d"
+    },
+    {
+      "path": "assets/source/artifacts.md",
+      "sha256": "615298a8607f551553462d2bce436137e15d63b06ddf36521aab50114755d495"
+    },
+    {
+      "path": "assets/source/reference-params.md",
+      "sha256": "b19d07f3ea960fe2bfeacde608161e2d59f458ab947789bcbc67384f02029a1c"
+    },
+    {
+      "path": "assets/source/skeletons.md",
+      "sha256": "08861a8b1d882f54c05f4dd6962e9a3e7995e2809e3863fb48c5706f9498fc37"
+    }
+  ],
+  "skeletons": [
+    {
+      "id": 1,
+      "path": "templates/skeletons/01-bus.md",
+      "title": "## 1. `run.mjs`  门禁总线",
+      "sourceSectionSha256": "d725b733399a55db1a0d783f81c991f1ead5d17875ffe7eb49281f493262d1ec",
+      "mode": "preserved"
+    },
+    {
+      "id": 2,
+      "path": "templates/skeletons/02-check.md",
+      "title": "## 2. 一条判据(门禁脚本)骨架",
+      "sourceSectionSha256": "49ead2a91fe2ff319bd045f9806f74cf7a138f16ebe079d29b67dd5ce11be5aa",
+      "mode": "preserved"
+    },
+    {
+      "id": 3,
+      "path": "templates/skeletons/03-probes.md",
+      "title": "## 3. 负向探针骨架",
+      "sourceSectionSha256": "078d7ea439d614e0b8b0cf42d6e5fa925684155b13aea0d465d06d8314e35b5c",
+      "mode": "preserved"
+    },
+    {
+      "id": 4,
+      "path": "templates/skeletons/04-fingerprint.md",
+      "title": "## 4. 指纹快照",
+      "sourceSectionSha256": "a1aadd38a962c8f8ab94fbe42c8e7204548ae0e9ef3a2af0c4094ced53a7cfd1",
+      "mode": "preserved"
+    },
+    {
+      "id": 5,
+      "path": "templates/skeletons/05-ratchet.md",
+      "title": "## 5. 棘轮基线",
+      "sourceSectionSha256": "3f8dee474913f2888adfd62b2e6b26fffe38a4621232363ff98ae8cda291dd6e",
+      "mode": "preserved"
+    },
+    {
+      "id": 6,
+      "path": "templates/skeletons/06-whitelist.md",
+      "title": "## 6. 白名单语法与两条铁律",
+      "sourceSectionSha256": "f474185947cecc09b67ca279f562e5f80b57aa40d9af24796c48225e1e3144ae",
+      "mode": "preserved"
+    },
+    {
+      "id": 7,
+      "path": "templates/skeletons/07-lanes.md",
+      "title": "## 7. lane 表 + Stop hook",
+      "sourceSectionSha256": "15cc54ea580f856ff20f610a07ce1ce929a8fa3438171a018dede500ef48e5c0",
+      "mode": "preserved"
+    },
+    {
+      "id": 8,
+      "path": "templates/skeletons/08-agent-hooks.md",
+      "title": "## 8. agent hook 注册",
+      "sourceSectionSha256": "64a23cad74e4e46c17b327cc4fbfa65f8946b361356a3ea5635236aa73f2ec29",
+      "mode": "preserved"
+    },
+    {
+      "id": 9,
+      "path": "templates/skeletons/09-git-hooks.md",
+      "title": "## 9. `lefthook.yml`",
+      "sourceSectionSha256": "98c5cf47668060ef503d968e4ec7685a3f9ae7000624e1d707985ceedf6dcb65",
+      "mode": "preserved"
+    },
+    {
+      "id": 10,
+      "path": "templates/skeletons/10-ci.md",
+      "title": "## 10. `.ci.yml`",
+      "sourceSectionSha256": "db5e44022bb749cb6f6e8d3db335dc72626ee74d5f737ffcbda5ca2f73a17e08",
+      "mode": "preserved"
+    },
+    {
+      "id": 11,
+      "path": "templates/skeletons/11-notes.md",
+      "title": "## 11. 决策记录骨架",
+      "sourceSectionSha256": "884080b51800b0fc6731a60d0fa77bc01fbed658ca689c6d6642aceb69c9ef4e",
+      "mode": "delegate"
+    },
+    {
+      "id": 12,
+      "path": "templates/skeletons/12-incidents.md",
+      "title": "## 12. 事故规则表",
+      "sourceSectionSha256": "a2f5d17fa4266381a69890315fccfea1a57ea6e4df94586e66e96c860b8f450a",
+      "mode": "preserved"
+    },
+    {
+      "id": 13,
+      "path": "templates/skeletons/13-context-budget.md",
+      "title": "## 13. 文档体量预算",
+      "sourceSectionSha256": "cf670cc4952afec4527f627151defa89495287c03b6593ff0dc79de57e81b0c1",
+      "mode": "preserved"
+    },
+    {
+      "id": 14,
+      "path": "templates/skeletons/14-guide.md",
+      "title": "## 14. 导览文档",
+      "sourceSectionSha256": "bd640ca28bb9e92dd1b61e4ffcd9a150ef25b7ed1664c39ae7cf7dac0156af47",
+      "mode": "preserved"
+    }
+  ],
+  "profiles": [
+    {
+      "path": "templates/profiles/backend.md",
+      "ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "path": "templates/profiles/frontend.md",
+      "ids": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ]
+    },
+    {
+      "path": "templates/profiles/shared.md",
+      "ids": [
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ]
+    }
+  ]
+}

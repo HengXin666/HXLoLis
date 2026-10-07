@@ -1,0 +1,5 @@
+{
+  "frozen": true,
+  "maxFiles": 16,
+  "reason": "14 类骨架各自一份文件, 这是它们被 templates/index.md 逐条引用的方式; 其正文是 assets/source/skeletons.md 的切片, sha256 由 scripts/verify-templates.ts 核对, 改动会让骨架校验失败."
+}

@@ -4,4 +4,4 @@
 **同一次改动里**保持同步. 事实就地更新,**不要追加变更历史**.
 
 但这不是改写决策的许可证. 决策被推翻要写新 note 并互相引用;
-被完全取代的 note 通过 node .agents/skills/hx-agent-notes/scripts/archive-note.ts .agents/notes/implemented/<class>/<file>.md 离开.
+被完全取代的 note 通过 node .agents/skills/hx-agent-notes/scripts/authoring/archive-note.ts .agents/notes/implemented/<class>/<file>.md 离开.

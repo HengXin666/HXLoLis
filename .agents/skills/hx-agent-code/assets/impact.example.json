@@ -1,0 +1,28 @@
+{
+    "complete": true,
+    "inputs": {
+        "frontend/api/user.ts": ["backend/user/public.py"],
+        "backend/user/public.py": ["backend/user/impl/query.py"]
+    },
+    "global": ["shared", "pyproject.toml", "pnpm-lock.yaml", "scripts/quality"],
+    "modules": {
+        "user-backend": {
+            "paths": ["backend/user", "tests/user/backend"],
+            "tests": ["user:backend:mock", "user:backend:real", "user:contract"],
+            "dependsOn": [],
+            "contracts": ["docs/reference/api/user.yaml"]
+        },
+        "user-frontend": {
+            "paths": ["frontend/api/user.ts", "frontend/ui/user", "tests/user/frontend"],
+            "tests": ["user:frontend:api", "user:frontend:ui", "user:e2e"],
+            "dependsOn": ["user-backend"],
+            "contracts": ["docs/reference/api/user.yaml"]
+        },
+        "docs": {
+            "paths": ["docs/tutorials"],
+            "tests": [],
+            "dependsOn": [],
+            "contracts": []
+        }
+    }
+}

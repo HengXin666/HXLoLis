@@ -1,0 +1,126 @@
+/* ============================================================================
+ * 设计令牌  唯一事实源
+ * ----------------------------------------------------------------------------
+ * 本文件**不依赖 Tailwind**, 只有 CSS 自定义属性与少量全局基础样式,
+ * 因此可以直接拷进任何项目 (包括非 Tailwind 的)。
+ *
+ * 改皮肤只改这里的变量, 组件代码一行不动。
+ * 暗色是默认; 亮色不是它的反相 (主色在亮色下要压暗才保得住白底对比度)。
+ * ==========================================================================*/
+
+:root, [data-mode="dark"] {
+  color-scheme: dark;
+
+  --background: rgb(20, 22, 30);
+  --foreground: rgb(220, 224, 234);
+  --card: rgb(26, 28, 36);
+  --card-foreground: rgb(220, 224, 234);
+  --popover: rgb(50, 53, 67);
+  --popover-foreground: rgb(220, 224, 234);
+  --primary: rgb(99, 102, 241);
+  --primary-foreground: rgb(255, 255, 255);
+  --secondary: rgb(38, 38, 40);
+  --secondary-foreground: rgb(220, 224, 234);
+  --muted: rgb(30, 30, 32);
+  --muted-foreground: rgb(138, 144, 160);
+  --accent: rgb(41, 41, 43);
+  --accent-foreground: rgb(220, 224, 234);
+  --destructive: rgb(255, 91, 91);
+  --destructive-foreground: rgb(0, 0, 0);
+  --border: rgb(42, 45, 56);
+  --input: rgb(48, 51, 64);
+  --ring: rgb(129, 132, 248);
+
+  /* 多分段图表: 等亮度等饱和, 只靠色相区分。
+     明度差会让读者把并列构成误读成大小对比。 */
+  --segment-1: oklch(0.72 0.12 268);
+  --segment-2: oklch(0.72 0.12 215);
+  --segment-3: oklch(0.72 0.12 165);
+  --segment-4: oklch(0.72 0.12 95);
+  --segment-5: oklch(0.72 0.12 25);
+
+  --font-sans: -apple-system, "SF Pro Text", "Helvetica Neue", "Noto Sans SC", sans-serif;
+  --font-mono: "SF Mono", "Fira Code", ui-monospace, monospace;
+
+  --radius: 0.5rem;
+
+  --shadow-xs: 0 1px 2px 0 hsl(0 0% 0% / 0.09);
+  --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.18), 0 1px 2px -1px hsl(0 0% 0% / 0.18);
+  --shadow-md: 0 1px 2px 0 hsl(0 0% 0% / 0.18), 0 2px 4px -1px hsl(0 0% 0% / 0.18);
+  --shadow-lg: 0 1px 2px 0 hsl(0 0% 0% / 0.18), 0 4px 6px -1px hsl(0 0% 0% / 0.18);
+  --shadow-xl: 0 1px 2px 0 hsl(0 0% 0% / 0.18), 0 8px 10px -1px hsl(0 0% 0% / 0.18);
+}
+
+[data-mode="light"] {
+  color-scheme: light;
+
+  --background: rgb(255, 255, 255);
+  --foreground: rgb(0, 0, 0);
+  --card: rgb(250, 250, 250);
+  --card-foreground: rgb(0, 0, 0);
+  --popover: rgb(255, 255, 255);
+  --popover-foreground: rgb(0, 0, 0);
+  --primary: rgb(79, 70, 229);          /* 压暗过, 纯 #6366f1 在白底上对比度不够 */
+  --primary-foreground: rgb(255, 255, 255);
+  --secondary: rgb(235, 235, 235);
+  --secondary-foreground: rgb(0, 0, 0);
+  --muted: rgb(242, 242, 242);
+  --muted-foreground: rgb(82, 82, 82);
+  --accent: rgb(235, 235, 235);
+  --accent-foreground: rgb(0, 0, 0);
+  --destructive: rgb(229, 75, 79);
+  --destructive-foreground: rgb(255, 255, 255);
+  --border: rgb(230, 230, 230);
+  --input: rgb(230, 230, 230);
+  --ring: rgb(79, 70, 229);
+
+  --segment-1: oklch(0.62 0.14 268);
+  --segment-2: oklch(0.62 0.14 215);
+  --segment-3: oklch(0.62 0.14 165);
+  --segment-4: oklch(0.62 0.14 95);
+  --segment-5: oklch(0.62 0.14 25);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 42%, transparent);
+  color: var(--foreground);
+}
+
+/* 全局关掉 outline, 交互控件改用 1px 边框变色表达焦点 */
+:focus-visible { outline: none; }
+
+/* macOS 式 overlay 滚动条: 默认透明, 只在容器被 hover / 聚焦时显形,
+   宽高始终占位所以不引起布局跳动。 */
+* { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+*:hover, *:focus-within {
+  scrollbar-color: color-mix(in srgb, var(--muted-foreground) 35%, transparent) transparent;
+}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*:hover::-webkit-scrollbar-thumb, *:focus-within::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--muted-foreground) 35%, transparent);
+  background-clip: padding-box;
+}
+
+/* 换主题时的过渡只作用于颜色类属性, 不碰 transform / opacity。 */
+[data-mode].theme-transitioning,
+[data-mode].theme-transitioning * {
+  transition: background-color 180ms ease, color 180ms ease,
+              border-color 180ms ease, box-shadow 180ms ease !important;
+}

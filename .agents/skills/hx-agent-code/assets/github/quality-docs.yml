@@ -1,0 +1,34 @@
+name: quality-docs
+on:
+    push:
+    pull_request:
+permissions:
+    contents: read
+jobs:
+    docs:
+        if: github.event.deleted != true
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                  persist-credentials: false
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '24'
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: '10'
+            - uses: astral-sh/setup-uv@v6
+            - name: Run docs checks and collect every finding
+              run: node .agents/skills/hx-agent-code/scripts/ci.ts docs
+            - name: Upload reports even when checks fail
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: quality-docs-${{ github.run_id }}-${{ github.run_attempt }}
+                  path: .hx-quality/reports/
+                  include-hidden-files: true
+                  if-no-files-found: warn

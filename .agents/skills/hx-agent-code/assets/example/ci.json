@@ -1,0 +1,21 @@
+{
+    "timeoutMs": 30000,
+    "setup": [],
+    "groups": {
+        "code": {
+            "tasks": [{ "id": "value-check", "command": ["node", "scripts/quality/task.ts", "check"], "format": "findings" }]
+        },
+        "docs": {
+            "tasks": [{ "id": "docs-check", "command": ["node", "scripts/quality/task.ts", "docs"], "format": "findings" }]
+        },
+        "build": {
+            "tasks": [{ "id": "build-value", "command": ["node", "scripts/quality/task.ts", "build"], "format": "exit" }]
+        },
+        "compatibility": {
+            "tasks": [],
+            "notApplicable": "The example produces a text file and has no deployment or upgrade environment"
+        }
+    },
+    "impact": { "id": "impact", "command": ["node", "scripts/quality/task.ts", "graph"], "format": "exit" },
+    "tests": [{ "id": "value:unit", "command": ["node", "scripts/quality/task.ts", "test"], "format": "exit" }]
+}
