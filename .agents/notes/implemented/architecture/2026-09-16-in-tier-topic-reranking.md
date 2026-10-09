@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/recall.ts`
+Decision-ID: in-tier-topic-reranking
+
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
 
 ## Problem
 
@@ -31,6 +36,8 @@ Status: implemented
 配套：`topic-fit` 判据保留（它防的是"擅长来源真的零产出"那一族），`evidence-substance` 判据保留（防"命中与查询只有字面重合"）。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **维持原诊断：第 0 层是空壳，应当丢弃或强制下降**：这是我上一轮写下的计划，看起来是"继续把上个决定做实"。**实测否决**：第 0 层里有 `rust-lang/rust` 这样的直接答案。丢整层会连它一起扔；强制下降则会让每一次查询都付出抓取第 1、2 层的代价，且第 1 层可能还没有第 0 层的那条结果。**诊断错了，修法就会错**这一轮最大的价值就是发现了这一点。
 - **把不适配的来源从结果里过滤掉**：能直接消灭"看到的全是无关结果"。否决理由：会丢掉有用线索，而且会让 `evidence-substance` 之类的判据失去输入。重排达到同样的可见性效果，代价为零。

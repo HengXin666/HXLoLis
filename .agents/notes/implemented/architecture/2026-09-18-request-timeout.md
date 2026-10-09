@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/argo-source.ts`（`send` 加超时清理 + 握手 15s 超时）
+Decision-ID: request-timeout
+
+
+## Code
+
+- `components/HX-Sagasu/src/argo-source.ts`
 
 ## Problem
 

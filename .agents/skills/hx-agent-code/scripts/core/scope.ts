@@ -38,6 +38,8 @@ export function parseChanges(raw: string): Change[] {
 
 /**
  * Preserve all snapshot inputs before project adapters read file contents
+ *
+
  * .agents/notes/implemented/process/2026-10-07-agent-code-installation-contract.md
  */
 export function collectScope(root: string, mode: string, base?: string, head?: string): Scope {

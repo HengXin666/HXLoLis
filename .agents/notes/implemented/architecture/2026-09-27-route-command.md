@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/scripts/sagasu.ts`（新增 `cmdRoute` + usage）、`tests/route-cli.test.ts`（新建）
+Decision-ID: route-command
+
+
+## Code
+
+- `components/HX-Sagasu/scripts/sagasu.ts`
+- `components/HX-Sagasu/tests/route-cli.test.ts`
 
 ## Problem
 
@@ -57,6 +63,8 @@ $ sagasu route "GPT 文生图 提示词"
 而在 `route` 之前，我要看到这一点得真跑一次并读完 20 条输出。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **不做，继续用 `search --explain`**：少一个命令。**否决理由**：**两者的成本差两个数量级**
   （0 秒 vs 25 秒），而**使用频次正好相反**  改词表是高频动作，排查慢是低频动作。

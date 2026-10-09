@@ -2,8 +2,14 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/scripts/sagasu.ts`（`cmdQuery` 走 `loadOrRebuild`；修 `chr(10)`）
+Decision-ID: derived-index-identity-wired
+
 - 相关: `components/HX-Sagasu/src/index-store.ts`（实现未变，此前**零调用方**）
+
+## Code
+
+- `components/HX-Sagasu/scripts/sagasu.ts`
+- `components/HX-Sagasu/src/index-store.ts`
 
 ## Problem
 
@@ -40,6 +46,8 @@ Status: implemented
 拒绝执行会让人以为"索引是坏的"，而实际是"无法判断它是否新鲜"。**如实标注胜过拒绝。**
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **让 `loadOrRebuild` 在 `queryIndex` 内部自动调用**：调用方彻底不会忘。否决理由：**`queryIndex` 是纯函数**（吃 `DerivedIndex` 吐结果），把"读文件 + 重建 + 回写"塞进去会让它变成有副作用的操作。而且重建需要账本，而 `queryIndex` 拿不到账本  强行合并会逼出一个"可选账本参数"，比现在更难理解。
 - **索引身份不符时直接报错退出**：最简单。否决理由：**派生索引是可丢的，真相在账本里**  身份不符不是错误状态，是**正常的生命周期事件**（换个分词器就该重建）。报错会让用户以为要手工修，而正确行为是自动重建、继续查询。

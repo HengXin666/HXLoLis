@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/scripts/diag/{README.md, minimal-repro.ts, minimal-control.mjs}`、本 note 取代 2026-09-18-minimal-repro.md 的结论部分
+Decision-ID: conclusion-overturned
+
+
+## Code
+
+- `components/HX-Sagasu/scripts/sagasu.ts`
+- `components/HX-Sagasu/scripts/diag/minimal-repro.ts`
 
 ## Problem
 
@@ -60,6 +66,8 @@ Status: implemented
 而这个现象**本身带随机性**。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **继续做单变量二分**（本轮已做到"给正常脚本加额外导入"这一步）：方向正确但**成本已经很高**（本 session 在此问题上约 25 轮）。**否决理由**：在**确认了偶发分量**之后，单变量二分的信噪比进一步下降  **一次运行的结果不再可信**，每组对照都需要多次重复才有意义，而每次运行 25-175 秒。**该换的是"判定方法"（多次重复）而不是继续加变量。**
 - **把上一轮的"目录决定论"留着不纠正**：省事，且它是"有实验数据支持"的。**否决理由**：**它是错的，而错的结论比没有结论更坏**  下一个人会按"换个目录就好"去行动，然后发现时好时坏，从而**不再相信这个项目的任何实验记录**。

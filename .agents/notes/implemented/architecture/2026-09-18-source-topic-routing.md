@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/route-sources.ts`（新建）、`src/recall.ts`（层内路由 + `ctx.route` 开关）
+Decision-ID: source-topic-routing
+
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
 
 ## Problem
 
@@ -72,6 +77,8 @@ Status: implemented
 **省下 23 个请求（-55%）、耗时降 30%，命中只差 1 条。**
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **照搬 argo 的 `domain_profiles.json`**（它的 TF-IDF 路由数据）：省掉写词表的工作。**否决理由**：实测它只覆盖 **65/157** 个引擎，而**我们接的 44 个来源里只有 12 个有文档**  照搬意味着 **32 个来源无法参与路由**，等于没做。
 - **沿用第一版"逐词余弦"**：实现更"算法化"，且能给出连续的相似度分数。**否决理由**：**实测推翻了它**  「Rust 所有权」跳过 `juejin`。它匹配的是"来源怎么描述自己"，而路由需要的是"查询属于哪个话题"。**词表可以补，但补不完**（见下方残留缺口）；类别是有限集，补得完。

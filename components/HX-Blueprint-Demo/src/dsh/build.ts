@@ -19,6 +19,10 @@ import { createDshRegistry, ROOT_INPUT, SUBGRAPHS, type NodeSpec } from "./archi
  * Agent 构建 API、自动布局。
  */
 
+/**
+ * HXLoLis 接入 Agent Notes v2
+ * .agents/notes/implemented/process/2026-10-08-repository-agent-notes-v2-adoption.md
+ */
 export interface BuiltDsh {
   readonly registry: ReturnType<typeof createDshRegistry>;
   readonly graph: BlueprintGraph;
@@ -39,7 +43,7 @@ export function buildRootGraph(): BuiltDsh {
     /**
      * 子图必须**显式声明**对外端口。
      *
-     * 子图节点的外形完全由 SubGraphDef 决定 —— 不声明就等于"没有任何端口",
+     * 子图节点的外形完全由 SubGraphDef 决定  不声明就等于"没有任何端口",
      * 所有连到它的边都会变成 unknown-port。库有从内部隧道推导的容错,
      * 但显式声明才可靠 (尤其这个子图还可能再被折叠)。
      */
@@ -47,7 +51,7 @@ export function buildRootGraph(): BuiltDsh {
      * 子图的端口 id 必须**与这个大步骤本身**完全一致。
      *
      * 踩过的坑 (实测: 挂完子图后所有边报 unknown-port, 整图 29 个错误):
-     * 节点一旦带 subgraph, 它的外形就**完全**由 SubGraphDef 决定 ——
+     * 节点一旦带 subgraph, 它的外形就**完全**由 SubGraphDef 决定 
      * 原节点上叫 history / assembly / state 的那些端口立刻消失, 而根图上的
      * 边还按原端口 id 连着, 于是全部悬空。
      *

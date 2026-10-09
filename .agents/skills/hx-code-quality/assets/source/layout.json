@@ -1,4 +1,4 @@
 {
   "frozen": true,
-  "reason": "weuinevolveweb 原件的逐字节快照, sha256 记在 assets/source/manifest.json; 同一份哈希被 scripts/verify-templates.ts 用来核对 templates/skeletons/ 的 sourceSectionSha256. 改一个字都会让骨架校验失败, 所以这里的文本与它派生的 14 份骨架都按上游原样保留."
+  "reason": "本仓首次提交 81a7eec77cf02e74d8a7e6a5f2f109d15cf73093 保存的文本快照保持冻结, 哈希范围为 repository-committed-text. manifest.json 同时保留未经验证的旧上游哈希, 不把本仓内容校验冒充上游保真验证"
 }

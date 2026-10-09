@@ -1,13 +1,21 @@
+import { captureFailure, saveReport } from './report.ts'
 import { readFileSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const skillRel = '.agents/skills/hx-code-quality/SKILL.md'
+/**
+ * 代码质量技能以目标项目证据生成全景
+ * .agents/notes/implemented/process/2026-10-02-code-quality-skill-project-specific-landscape.md
+ * 常驻上下文的分层判据与 REF-26 的补全
+ * .agents/notes/implemented/process/2026-10-06-context-layer-gate-and-ref26-completeness.md
+ */
 const noteRels = [
-  '.agents/notes/implemented/process/2026-10-02-code-quality-skill-project-specific-landscape.md',
-  '.agents/notes/implemented/process/2026-10-06-context-layer-gate-and-ref26-completeness.md',
+  '.agents/' + 'notes/implemented/process/2026-10-02-code-quality-skill-project-specific-landscape.md',
+  '.agents/' + 'notes/implemented/process/2026-10-06-context-layer-gate-and-ref26-completeness.md',
 ]
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..')
+captureFailure("note-links", root)
 
 function section(text, title) {
   const start = text.indexOf(title)
@@ -39,10 +47,6 @@ if (process.argv.includes('--self-test')) {
 } else {
   const skill = readFileSync(resolve(root, skillRel), 'utf8')
   const errors = noteRels.flatMap((rel) => checkLinks(skill, readFileSync(resolve(root, rel), 'utf8'), rel))
-  if (errors.length) {
-    for (const error of errors) console.error(error)
-    process.exitCode = 1
-  } else {
-    console.log('skill/note citations: both directions present for ' + noteRels.length + ' note(s)')
-  }
+  saveReport('note-links', errors.map((message) => ({ rule: 'note-link', severity: 'error', message })), root)
+  process.exitCode = errors.length ? 1 : 0
 }

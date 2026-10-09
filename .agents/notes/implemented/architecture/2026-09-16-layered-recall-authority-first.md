@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/{recall,authoritative}.ts`
+Decision-ID: layered-recall-authority-first
+
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
 
 ## Problem
 
@@ -31,6 +36,8 @@ Status: implemented
 第 0 层实测可用的 7 个接口（全部无需凭证）：crossref / arxiv / github / wikipedia / hackernews / pubmed / openalex。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **维护一张"权威网站白名单"，用域名匹配**：实现最简单，且能覆盖任意站点。否决理由：域名白名单是一个**无法执行、无法反驳**的判断它不告诉任何人"这条证据凭什么信"。而且它会腐烂（站点改版、被收购、内容质量变化）却没有任何机制发现。用持久标识符则相反：标识符本身就是可验证的，且验证动作在**外部系统**里（DOI 解析、PMID 查询），不依赖我们的判断。
 - **把不相关的权威源也登记进第 0 层**（"某网站在现实里很权威就放进去"）：看起来覆盖率更高。否决理由：充分性判断基于**供给**。登记一个取不到数据的来源，会让"第 0 层返回了 3 条"这个判断建立在幽灵之上；更糟的是它会让报告里的"权威层覆盖"数字失真。

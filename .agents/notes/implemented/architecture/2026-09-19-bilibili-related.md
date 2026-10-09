@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/adapters/bilibili.ts`（`relatedVideos`）、`scripts/sagasu.ts`（`thread --related`）
+Decision-ID: bilibili-related
+
+
+## Code
+
+- `components/HX-Sagasu/scripts/sagasu.ts`
+- `components/HX-Sagasu/src/adapters/bilibili.ts`
 
 ## Problem
 
@@ -36,6 +42,8 @@ Status: implemented
 **两者是不同的信号。** 在 `thread` 场景里后者更有用  它回答的是「楼主这个帖子周围还有什么」，而 search 回答的是「哪些帖子提到了这个词」。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **不做，接受 2/12**：省事。**否决理由**：**未达标的只有这一条**，而复核本身有独立价值  它确认了既有登记**不是拍脑袋写的**，也排除了「其实早就通了只是没人测」这种可能。
 - **把 12 个平台全做一遍**：更快推进。**否决理由**：**网络层不可达的平台做不了**  本轮已实测 Reddit/YouTube 连 `fetch` 都失败。**先做能做的**（B站），其余标注清楚。

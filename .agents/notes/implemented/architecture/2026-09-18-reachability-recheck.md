@@ -2,7 +2,14 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/adapters/registry.ts`（Telegram 证据）、`src/argo-source.ts`（duckduckgo 标注）、`tests/argo-source.test.ts`（2 条健全性测试）
+Decision-ID: reachability-recheck
+
+
+## Code
+
+- `components/HX-Sagasu/src/argo-source.ts`
+- `components/HX-Sagasu/src/adapters/registry.ts`
+- `components/HX-Sagasu/tests/argo-source.test.ts`
 
 ## Problem
 
@@ -69,6 +76,8 @@ devto          "javascript" →  2 条
    - **实测坏掉的引擎仍保留登记**  删掉会让"恢复后没人知道要加回来"。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **把 Telegram 从 `ready` 改成 `blocked-anti`**：状态更"准确"。**否决理由**：`blocked-anti` 的语义是"**有公开面但被风控挡住（直连被拒）**" 而这里不是风控，是**本机网络到该域不可达**。改状态会让下一个换到能连 Telegram 的网络的人**以为这条路已被否决**。**改证据、不改状态**更准确：状态说"代码可用"，证据说"当前网络不可达"。
 - **把 duckduckgo 从 `ARGO_ENGINE` 里删掉**：省掉每次白跑的请求。**否决理由**：**它可能只是上游临时故障**。删掉之后，它恢复时**没有任何机制提醒我们加回来**  而保留登记 + 注释 + 测试，让"它是坏的"成为一个**被记录、可复核**的事实。**这与本项目对"未实测的假设"的态度一致：记录不确定性，而不是消灭它。**

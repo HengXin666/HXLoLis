@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/scripts/sagasu.ts`（`usage()` 补全）、`research-output/hx-sagasu/2026-09-17-status-qa.md`（补当前状态摘要 + 更正 §2.2）
+Decision-ID: discoverability-and-docs
+
+
+## Code
+
+- `components/HX-Sagasu/scripts/sagasu.ts`
 
 ## Problem
 
@@ -51,6 +56,8 @@ usage:  search / sources / query          ← 少了两个
 （「现在能不能跑」「有没有前端」），只是时点从 09-17 推到 09-19。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **只更新文档，不修 `usage`**：改动更小。**否决理由**：**那是把「能力不可发现」当成文档问题**。
   它其实更严重: 用户不会读到研究文档，他只会跑 `sagasu` 看帮助。

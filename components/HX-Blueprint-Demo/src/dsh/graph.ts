@@ -12,13 +12,13 @@ import { EXEC_IN_PORT } from "@hx/ui";
  *     源码: `while (await this.turn()); turn() 末尾 `return true` 表示再来一轮
  *
  *   checkEmptyFirst ->(empty) turnEnd
- *     源码: `turnEnds = { kind: "completed" }; return false` —— 直接结束, 不进步骤
+ *     源码: `turnEnds = { kind: "completed" }; return false`  直接结束, 不进步骤
  *
  *   checkReject ->(reject) turnEnd
  *     源码: 同上, `kind: "blocked"`
  *
  *   stream -> checkFinish ->(error) requestError ->(retry) prepareRequest
- *     源码: `continue` 回到 while(true) 顶部 —— **重试复用已渲染的组装结果,
+ *     源码: `continue` 回到 while(true) 顶部  **重试复用已渲染的组装结果,
  *     不重新组装、不重跑 pre-step、不重复追加 user 消息**
  *
  *   executionMode ->(exclusive) exclusiveBarrier / (parallel) parallelPool
@@ -27,7 +27,7 @@ import { EXEC_IN_PORT } from "@hx/ui";
  * ## 分组注释
  *
  * 图里带三条注释, 对应源码里的三个自然段落: 轮次、步骤、工具调度。
- * 拖动注释会带走完全落在里面的节点 —— 重排布局时它们是一整块。
+ * 拖动注释会带走完全落在里面的节点  重排布局时它们是一整块。
  */
 
 const n = (id: string, type: string, x: number, y: number, extra: Record<string, unknown> = {}) => ({
@@ -85,7 +85,7 @@ export const dshAgentLoopGraph: BlueprintGraph = {
     // ── 轮次收尾 ──
     // stepEnd 的执行入口是独占的, 而源码里 maxTokens 与 commit 两条路都汇到
     // finally 块的 step/end。蓝图里用一个显式的汇聚节点表达"两条路汇合",
-    // 而不是让某一条赢 —— 后者会把"总是写 step/end"这个语义画丢。
+    // 而不是让某一条赢  后者会把"总是写 step/end"这个语义画丢。
     n("stepJoin", "stepJoin", 340, 2220),
     n("stepEnd", "stepEnd", 340, 2280),
     n("turnStopping", "turnStopping", 340, 2380),
@@ -184,7 +184,7 @@ export const dshAgentLoopGraph: BlueprintGraph = {
     {
       id: "c-step",
       title: "一个步骤",
-      body: "while(true) 的重试回到 prepareRequest 之后 —— 复用已渲染组装, 不重新组装、不重跑 pre-step。",
+      body: "while(true) 的重试回到 prepareRequest 之后  复用已渲染组装, 不重新组装、不重跑 pre-step。",
       x: 280, y: 1030, w: 460, h: 720,
       tone: "warning",
     },
@@ -203,7 +203,7 @@ export const dshAgentLoopGraph: BlueprintGraph = {
 /**
  * 三个可折叠的区域。
  *
- * 演示页的"折叠"按钮用它们 —— 一张 30 个节点的图平铺着看不清结构,
+ * 演示页的"折叠"按钮用它们  一张 30 个节点的图平铺着看不清结构,
  * 折成三块之后层次才出来。这也是蓝图库自己的卖点: 用自己演示自己。
  */
 export const COLLAPSIBLE_GROUPS = {

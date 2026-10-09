@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/fetchers.ts`
+Decision-ID: assembly-point-drops-wired-sources
+
+
+## Code
+
+- `components/HX-Sagasu/src/fetchers.ts`
 
 ## Problem
 

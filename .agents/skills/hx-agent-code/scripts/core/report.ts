@@ -1,4 +1,6 @@
 import { createHash } from "node:crypto";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 import { list, record, string } from "./model.ts";
 import type { Baseline, Finding } from "./model.ts";
 
@@ -41,6 +43,36 @@ function escape(value: string): string {
     return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
         .replaceAll("|", "&#124;").replaceAll("`", "&#96;").replaceAll("[", "&#91;")
         .replaceAll("]", "&#93;").replaceAll("\r", " ").replaceAll("\n", " ");
+}
+
+/**
+ * Summarize diagnostics after their complete report has been saved
+ * .agents/notes/implemented/process/2026-10-10-gates-save-full-reports.md
+ */
+export function consoleReport(findings: Finding[], output: string): void {
+    const types: Record<string, number> = Object.create(null);
+    for (const item of findings) types[item.ruleId] = (types[item.ruleId] ?? 0) + 1;
+    if (findings.length <= 10) {
+        for (const item of findings) console.log(`${item.severity} [${item.ruleId}] ${item.path}:${item.line} ${item.message}`);
+    }
+    console.log(`Quality: ${findings.length} 项问题`);
+    if (findings.length) console.log("类型: " + Object.keys(types).sort().map((rule) => `${rule}=${types[rule]}`).join(", "));
+    console.log("完整报告: " + output);
+}
+
+export function saveToolError(error: unknown, output: string): void {
+    const message = error instanceof Error ? error.message : String(error);
+    const finding: Finding = { ruleId: "tool-error", severity: "error", path: "", line: 1,
+        message, evidence: "CLI", fingerprint: fingerprint("tool-error", "", "CLI", message) };
+    const report = makeReport([finding], []);
+    try {
+        mkdirSync(dirname(resolve(output)), { recursive: true });
+        writeFileSync(output + ".json", JSON.stringify(report.json, null, 4) + "\n");
+        writeFileSync(output + ".md", report.markdown);
+        consoleReport([finding], resolve(output + ".json"));
+    } catch (failure) {
+        console.error("Quality: 1 项错误, 类型 report-write-error, " + String(failure));
+    }
 }
 
 export function makeReport(findings: Finding[], baseline: Baseline[]) {

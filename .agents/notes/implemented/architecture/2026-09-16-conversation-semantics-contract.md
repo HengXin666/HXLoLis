@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/{normalize,thread,resolve,types,types-text}.ts`, `components/HX-Sagasu/tests/*.test.ts`
+Decision-ID: conversation-semantics-contract
+
+
+## Code
+
+- `components/HX-Sagasu/src/types.ts`
+- `components/HX-Sagasu/tests/sink.test.ts`
 
 ## Problem
 
@@ -27,6 +33,8 @@ HX-Sagasu 的目标要求在"对话式（论坛）语义中做精确理解：错
 - `单个错字不足以判定不相关` 测试锁死"不能因为一个错字就判不相关"。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **归一化就地覆盖原文（`text = normalized`）**：实现最简单，且下游只需读一个字段。否决理由：证据一旦被改写就不可核查引用出去的句子在源站上不存在，整条"可核查"承诺作废。这个代价在功能测试里看不出来，只在"用户拿引用去核对"时爆。
 - **引用链推断结果不标记，直接当事实写入**：数据更完整、下游更省事。否决理由：推断规则（重叠 + 距离）必然有假阳性；一旦与真引用混在一起，就没有任何下游能区分，而"把 A 的话安到 B 头上"是会改变结论的错误类型。标记的代价只是一个可选字段。

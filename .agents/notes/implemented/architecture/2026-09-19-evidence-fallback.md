@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/fallback.ts`（新建）、`scripts/sagasu.ts`（`search` 输出接入）
+Decision-ID: evidence-fallback
+
+
+## Code
+
+- `components/HX-Sagasu/scripts/sagasu.ts`
+- `components/HX-Sagasu/src/fallback.ts`
 
 ## Problem
 

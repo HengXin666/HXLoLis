@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/adapters/{adapter,bilibili,telegram,registry}.ts`
+Decision-ID: platform-adapters-l0
+
+
+## Code
+
+- `components/HX-Sagasu/src/adapters/adapter.ts`
 
 ## Problem
 

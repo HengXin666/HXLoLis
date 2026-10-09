@@ -13,7 +13,10 @@ metadata:
 
 这是一次性施工技能, 安装后由项目脚本和 hook 持续执行红线, 不要求每次开发重新加载完整技能. 补装时读取已有 coverage, 只实现缺项并核对接线, 不重复创建配置或覆盖用户改动
 
-必须依赖 `../hx-agent-notes/SKILL.md`: 开始非平凡改动前读取, 由它负责决策记录、AST 锚点、双链和配对 diff. 若目标有另一安装位置, 读取目标的真身; 依赖缺失时明确报告并准备安装, 不复制其实现来假装依赖已满足
+必须依赖 hx-agent-notes 与 hx-make-skill: 前者负责决策记录、AST 锚点、双链和配对 diff, 开始非平凡改动前读取它的 SKILL.md; 后者提供本技能自身的文本与布局门禁. 按顺序查找第一个存在的安装: 本技能同级目录, 目标仓库 `.agents/skills` 或 `.dsh/skills`, 用户级 `~/.dsh/skills`, `~/.agents/skills` 或 `${CODEX_HOME:-~/.codex}/skills`. 全部缺失时明确报告并准备安装, 不复制其实现来假装依赖已满足
+
+
+所有门禁先保存本次完整诊断文件, 包括成功结果和工具故障. 对外按本次问题总数决定展示: 超过 10 条只列数量与类型统计, 不列逐项详情; 不超过 10 条才可展开全部详情. 错误, 警告和待审核合计计数, 不按类型拆开绕过阈值. 终端, hook, CI 摘要与机器人评论遵守同一规则, 附完整报告路径或 artifact 链接. 子进程 stdout/stderr 与复现命令写入文件, 不直接透传; 报告写入失败按工具错误失败, 保持原校验退出码语义
 
 ## 步骤
 
@@ -30,7 +33,7 @@ metadata:
 
 本地以最终工作区 Diff 为入口, 允许完整文件/函数/依赖上下文. 不边开发边测试, 修改完成后统一执行 affected 测试; 修复失败后重跑受影响项. Push affected, PR 全量测试, 质量与文档仍按 Diff. 旧项目用可信 baseline 区分历史与新增, 不自动批准当前违规
 
-内置脚本只提供跨项目通用的 scope、selection、report、coverage 算法. 语言 checker、hook 配置与 CI 必须按目标项目实现并验证, 未完成的适用项标 blocked, 不把示例或空壳计作已安装. 新第三方库需用户决定, 已有授权不重复确认
+内置脚本只提供跨项目通用的 scope、selection、report、coverage 算法. 语言 checker、hook 配置与 CI 必须按目标项目实现并验证, 未完成的适用项标 blocked, 不把示例或空壳计作已安装. 取证时必须产出架构与依赖推荐, 实施时核对任务范围与已有授权, 仅未授权的选择交用户决定, 见 `steps/1-discover/impl/proposals.md`, 已有授权不重复确认
 
 ## 按需资料
 
@@ -53,14 +56,26 @@ metadata:
 - `scripts/core/audit.ts`: 核查逐条安装证据时读, 规则目录为期望清单
 - `assets/impact.example.json`: 建立项目图适配器时参考, 路径与测试 ID 需替换, 不能直接证明图完整
 - `assets/coverage.example.json`: 填写逐规则证据时参考, 故意不完整, 直接 audit 应失败
+- `assets/approvals.example.json`: 记录推荐与授权时参考字段, 占位值需替换为实际查证结果
 - `assets/github/index.md`: 安装 GitHub 流程时读, 四个可复制 YAML 的索引
 - `assets/collaboration/index.md`: 安装协作文件时读, Issue/PR/CODEOWNERS/CONTRIBUTING 模板索引
 - `assets/example/index.md`: 验证 CI 接线或适配项目命令时读, 可运行最小示例
 
-运行环境为 Git 和 Node 22.18+ 的原生 TypeScript 执行, 无 npm 运行期依赖. 安装复制 CLI/core 时也复制 references/rules.md 到相同相对位置, audit 从该目录读取. 图未匹配当前快照时必须设置 complete 为 false
+运行环境为 Git 和 Node 22.18+ 的原生 TypeScript 执行, 无 npm 运行期依赖. 安装时固定版本 vendor 整个技能, 不拆复制, audit 从 vendor 内的 references/rules.md 读取规则目录. 本地与 CI 的缓存、报告、构建产物统一放在目标仓库 `scripts/.hx_code_quality/`. 图未匹配当前快照时必须设置 complete 为 false
 
 ## 产物约束
 
-本技能及其生成的所有文本遵守 `../hx-make-skill/references/prose-rules.md`, 脚本遵守 `../hx-make-skill/references/code-quality.md`. 代码保持 4 空格、120 列、300 行与每目录 6 文件上限; Python AST 适配器是语言原生解析所需例外, 通过 uv 执行. 产物按相同要求验证, 不能因模板生成而豁免
+两类文本分开约束, 不混用
 
-- `README.md`: 仅维护本技能时读取, 包含验证命令、测试索引、来源和决策记录
+- 本技能目录内的文本遵守 hx-make-skill 的 `references/prose-rules.md`, 脚本遵守其 `references/code-quality.md`. 修改本技能后在技能目录执行下面三条, 全部退出 0 才算完成, `<make>` 为上面查找到的 hx-make-skill 目录
+- 写入目标项目的文本 (inventory, CONTRIBUTING, PR/Issue 模板, docs) 遵守规则目录中的 HC-TEXT/HC-DOCNAME/HC-DOCSIZE 与项目已有文风, 由目标项目自己安装的 checker 验证, 不套用本技能的句末与折行规则
+- 写入目标项目的代码遵守规则目录中的 HC-FORMAT/HC-SIZE/HC-EXT; Python AST 适配器是语言原生解析所需例外, 通过 uv 执行. 模板生成的产物同样验证, 不因来自模板而豁免
+
+```sh
+uv run <make>/scripts/validate_skill.py .
+uv run <make>/scripts/prose_rules.py --check .
+uv run <make>/scripts/check_layout.py .
+```
+
+- `README.md`: 仅维护本技能时读取, 包含完整验证命令、来源和决策记录
+- `scripts/tests/index.md`: 修改 scripts 下算法后读, 列出每个测试覆盖的范围

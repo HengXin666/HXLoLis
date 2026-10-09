@@ -20,6 +20,8 @@ impact 命令读取 HX_QUALITY_SCOPE, 输出 core/affected.ts 所需 Graph JSON,
 
 所有命令接收 HX_QUALITY_SCOPE 指向本次范围 JSON, checker 必须以此选择文件, 不静默全仓扫描; 范围的 head 为已核对 checkout 对应树. 构建任务把可供测试消费的输出写到 HX_QUALITY_BUILD, 测试从同一路径消费, 不重新构建来替代传递产物
 
-每组产出 `.hx-quality/reports/<group>.md` 和 JSON, tests 另产出 `test-plan.json`. build 先清理自身输出目录, 成功后封存非空产物或明确的不适用凭证; 下载的产物只能来自同次 workflow run, tests 验证源代码树与摘要后才执行
+每组产出 `scripts/.hx_code_quality/reports/<group>.md` 和 JSON, tests 另产出 `test-plan.json`. build 先清理自身输出目录, 成功后封存非空产物或明确的不适用凭证; 下载的产物只能来自同次 workflow run, tests 验证源代码树与摘要后才执行
 
 runner 基线只分类业务 finding, HC-CI 执行错误不可被 baseline 豁免. 新基线条目需独立审批并成为可信基准, 项目元门禁还须审计移除规则、放宽阈值及 baseline 变更. 本入口不替代 coverage audit
+
+子进程输出保存在 reports/<分组>-tasks/, 完整诊断写入分组 JSON/Markdown, 终端仅在问题合计不超过 10 时展示详情

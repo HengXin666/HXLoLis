@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/argo-source.ts`、`components/HX-Sagasu/src/recall.ts`
+Decision-ID: argo-wiring-three-constraints
+
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
 
 ## Problem
 
@@ -39,6 +44,8 @@ if (fetch === undefined) return []      // ← 静默变成"没有内容"
 - `usable.length === 0` 的两种含义分开：**该层没有登记来源**（正常）vs **登记了但没有实现**（未接线）。后者带 failures 上报，`ran: false`  **没有接线不是"跑过"**，这一层没发出任何请求，不构成供给
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **只把约束写进注释，不落到代码**（上一轮的做法）：最省事，而且 note 里确实写清楚了。否决理由：**注释不会拒绝缓存**。这一轮实测里 `bilibili` 请求直接返回了 `juejin` 的缓存内容如果代码不拦，这份"掘金的内容"会以"B站的结果"进入证据链并进入账本。约束写进注释与写进代码的差别，就是这份错误证据会不会被沉淀。
 - **宽松处理 cached：接受它但把 `engines_used` 标进 snippet**：能让系统更"可用"，不会平白失败。否决理由：结果会带着错误的来源标签进入 `SOURCES` 的分层语义（第 1 层的"B站"与"掘金"权威性依据不同），而 `source-diversity` 等判据都按 `sourceId` 统计。**让调用方自己从 snippet 里读来源，等于把判定责任推给下游。**

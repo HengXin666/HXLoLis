@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/argo-source.ts`（`ARGO_ENGINE` 15 → 33）、`src/recall.ts`（`SOURCES` 26 → 44）、`src/fetchers.ts`（`SOURCE_PLAN`）、`tests/registry-consistency.test.ts`（`IMPL_OWNER`）
+Decision-ID: authoritative-engine-families
+
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
+- `components/HX-Sagasu/tests/registry-consistency.test.ts`
 
 ## Problem
 
@@ -89,6 +95,8 @@ pypi, stackoverflow`
 这是本轮最该被记住的结论。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **把这批权威源全部登记在第 0 层**（它们的**内容**确实最权威）：语义上更准确，且能让"权威优先"这一层直接受益。**否决理由**：本项目第 0 层的语义是"**我们原生直连、亲自实现并可验证**"，而测试精确地守卫了这一点（"第 0 层每一个登记来源都必须有取数实现"）。放进去会让"权威层"从"我们亲自实现"退化成"别人实现的、我们信它权威"  **那正是我们拒绝的域名白名单思路**（见 `2026-09-18-engine-breadth-and-skip-cache.md` 的同款论证）。改为按"实现来源 + 实测产出"分层。
 - **为这 18 个源各自写原生 HTTP 客户端**（像第 0 层那 11 个那样）：控制力最强、失败语义最精确、能让它们真的进第 0 层。**否决理由**：这是 **18 份独立工作**（鉴权、解析、限流、错误映射各一套），而 argo 已经解决了这些。**把"广度"交给 argo、把"权威性判定"留给自己**这个分工在 `port-not-fork` 那轮已经论证过，本轮只是把它贯彻到更多来源。

@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/authoritative.ts`
+Decision-ID: source-title-is-evidence
+
+
+## Code
+
+- `components/HX-Sagasu/src/authoritative.ts`
 
 ## Problem
 

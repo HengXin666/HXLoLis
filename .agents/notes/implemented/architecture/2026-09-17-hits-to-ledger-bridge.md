@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/sink.ts`（新增）、`components/HX-Sagasu/tests/sink.test.ts`（新增）
+Decision-ID: hits-to-ledger-bridge
+
+
+## Code
+
+- `components/HX-Sagasu/src/sink.ts`
+- `components/HX-Sagasu/tests/sink.test.ts`
 
 ## Problem
 

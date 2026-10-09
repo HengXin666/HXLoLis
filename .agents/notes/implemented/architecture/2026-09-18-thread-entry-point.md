@@ -2,8 +2,14 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/scripts/sagasu.ts`（新增 `thread` 子命令）
+Decision-ID: thread-entry-point
+
 - 相关: `src/resolve.ts`（实现未变，此前**零调用方**）、`src/thread.ts`、`src/adapters/*`
+
+## Code
+
+- `components/HX-Sagasu/scripts/sagasu.ts`
+- `components/HX-Sagasu/src/thread.ts`
 
 ## Problem
 
@@ -65,6 +71,8 @@ CLI 第一版我用**凭印象的字段名**写显示层，实测三个全错：
 标签明确写成"**不是**指代目标，只是字面相关"。两者语义不同，混用就会引用错人。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **不做 CLI 入口，留给将来的 API**：省掉一个子命令。否决理由：**"没有真实入口"是本组件已经栽过两次的病**（`resolve` 核心场景坏了 16 轮、`loadOrRebuild` 零调用方）。API 是"将来"，而**能跑一次是现在**。
 - **让 CLI 从查询文本里自动猜帖子引用**：体验更顺。否决理由见上**猜错会静默拿到别人的帖子**。显式 `--thread` 是隐私边界上唯一可接受的默认。

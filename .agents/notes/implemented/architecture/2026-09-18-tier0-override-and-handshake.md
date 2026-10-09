@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/fetchers.ts`（整层补齐避让已登记来源）、`src/argo-source.ts`（握手改懒发）
+Decision-ID: tier0-override-and-handshake
+
+
+## Code
+
+- `components/HX-Sagasu/src/fetchers.ts`
 
 ## Problem
 
@@ -78,6 +83,8 @@ authoritative 的原生 HTTP），于是**它们不在 `claimed` 里 → 被整�
 而**时间线是能一次性看到差异的东西**。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **把握手超时从 15 秒调大**（如 60 秒）：能"解决"当前症状。**否决理由**：**症状会以别的方式回来**  真正的问题是计时器起点，而不是值太小。而且 60 秒的握手等待会让"argo 不可用"变成一个**要等一分钟才发现**的事实。
 - **只修 wikipedia 覆盖，不修握手**：改动更小。**否决理由**：两者是**独立**的问题（一个在组装层、一个在会话层），各修各的。实测证明修前者不改变后者的表现。

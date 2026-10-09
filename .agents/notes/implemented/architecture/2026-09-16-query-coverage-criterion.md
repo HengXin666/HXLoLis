@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/recall.ts`
+Decision-ID: query-coverage-criterion
+
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
 
 ## Problem
 

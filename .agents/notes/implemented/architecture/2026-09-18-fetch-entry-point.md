@@ -2,8 +2,14 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/scripts/sagasu.ts`（新增 `fetch` 子命令，两条路径）
+Decision-ID: fetch-entry-point
+
 - 相关: `src/url-safety.ts`、`src/readability.ts`（实现未变，此前**都零调用方**）
+
+## Code
+
+- `components/HX-Sagasu/scripts/sagasu.ts`
+- `components/HX-Sagasu/src/url-safety.ts`
 
 ## Problem
 
@@ -72,6 +78,8 @@ $ sagasu fetch http://0177.0.0.1/
 那正是移植 `url_safety.py` 时特意保留的判定。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **只保留默认（argo）路径**：省掉一个分支。否决理由：**那会让 `readability.ts` 永远是零调用方**  它的标签级信息在 argo 的纯文本输出里已经丢了。**不接它，就等于移植了不用。**
 - **只保留 `--native` 路径**：彻底不依赖 argo 抓取。否决理由：**反爬站会全部失败**（TLS 指纹、Cloudflare 挑战、JS 渲染）。那正是 argo 的降级链 7 级要解决的问题，也是"用它的"这个分工的核心理由。

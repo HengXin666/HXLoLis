@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/resolve.ts`
+Decision-ID: filtering-is-not-relevance
+
+
+## Code
+
+- `components/HX-Sagasu/src/resolve.ts`
 
 ## Problem
 

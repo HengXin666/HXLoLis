@@ -1,3 +1,4 @@
+import { captureFailure, saveReport } from './report.ts'
 import { createHash } from 'node:crypto'
 import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -12,7 +13,11 @@ const sourceNames = ['README.md', 'artifacts.md', 'reference-params.md', 'skelet
 const ids = (text) => [...text.matchAll(/^\|(\d+)\|/gm)].map((match) => Number(match[1]))
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b)
 
-function verify(root) {
+/**
+ * Verify the committed source snapshot and its derived templates
+ * .agents/notes/implemented/bug-fix/2026-10-10-template-manifest-tracks-committed-snapshot.md
+ */
+export function verify(root) {
   const errors = []
   const check = (ok, message) => { if (!ok) errors.push(message) }
   const read = (path) => {
@@ -24,8 +29,13 @@ function verify(root) {
   try { manifest = JSON.parse(read('assets/source/manifest.json')) }
   catch { return [...errors, 'invalid manifest'] }
   check(manifest.version === 1, 'manifest version must be 1')
+  check(manifest.digestScope === 'repository-committed-text', 'manifest digest scope must identify the committed text')
+  check(/^[a-f0-9]{40}$/.test(manifest.snapshotCommit ?? ''), 'manifest snapshot commit is missing or invalid')
   check(same(manifest.sources.map((item) => item.path), sourceNames.map((name) => 'assets/source/' + name)), 'four original documents must be registered')
-  for (const item of manifest.sources) check(hash(read(item.path)) === item.sha256, 'original content changed: ' + item.path)
+  for (const item of manifest.sources) {
+    check(/^[a-f0-9]{64}$/.test(item.suppliedSha256 ?? ''), 'supplied source digest is missing: ' + item.path)
+    check(hash(read(item.path)) === item.sha256, 'original content changed: ' + item.path)
+  }
   const entry = read('SKILL.md')
   const index = read('templates/index.md')
   check(entry.includes('templates/index.md'), 'SKILL must route to template entry')
@@ -38,6 +48,7 @@ function verify(root) {
   const headers = [...originalSkeleton.matchAll(/^## (\d+)\. .*$/gm)]
   check(same(manifest.skeletons.map((item) => item.id), Array.from({ length: 14 }, (_, i) => i + 1)), 'all fourteen skeletons must be mapped')
   for (const item of manifest.skeletons) {
+    check(/^[a-f0-9]{64}$/.test(item.suppliedSectionSha256 ?? ''), 'supplied section digest is missing: ' + item.id)
     const text = read(item.path)
     check(index.includes(item.path), 'unreachable skeleton: ' + item.path)
     const i = headers.findIndex((match) => Number(match[1]) === item.id)
@@ -111,10 +122,15 @@ function mutate(root, path, transform) {
   writeFileSync(file, transform(readFileSync(file, 'utf8')))
 }
 
-const args = process.argv.slice(2)
-if (args.length === 1 && args[0] === '--self-test') selfTest()
-else if (!args.length || (args.length === 2 && args[0] === '--root' && args[1])) {
-  const errors = verify(args.length ? resolve(args[1]) : defaultRoot)
-  if (errors.length) { console.error(errors.join('\n')); process.exitCode = 1 }
-  else console.log('PASS originals=4 skeletons=14 rules=31 profiles=3 stage-routing=ok')
-} else { console.error('Usage: verify-templates.mjs [--root DIR | --self-test]'); process.exitCode = 2 }
+function main(args: string[]): void {
+  captureFailure('templates', defaultRoot)
+  if (args.length === 1 && args[0] === '--self-test') selfTest()
+  else if (!args.length || (args.length === 2 && args[0] === '--root' && args[1])) {
+    const root = args.length ? resolve(args[1]) : defaultRoot
+    const errors = verify(root)
+    saveReport('templates', errors.map((message) => ({ rule: 'template-contract', severity: 'error', message })), root)
+    process.exitCode = errors.length ? 1 : 0
+  } else { console.error('Usage: verify-templates.ts [--root DIR | --self-test]'); process.exitCode = 2 }
+}
+
+if (resolve(process.argv[1] ?? '') === script) main(process.argv.slice(2))

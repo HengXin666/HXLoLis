@@ -2,8 +2,14 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/scripts/sagasu.ts`（`thread` 子命令加 `--at` 游标 + 歧义输出）
+Decision-ID: cursor-multiturn-wired
+
 - 相关: `src/resolve.ts`（实现未变，`cursorTurnId` 此前**零外部调用方**）
+
+## Code
+
+- `components/HX-Sagasu/scripts/sagasu.ts`
+- `components/HX-Sagasu/src/resolve.ts`
 
 ## Problem
 
@@ -36,6 +42,8 @@ sagasu thread bilibili:BV1GJ411x7h7 --ask "楼上说得对吗" --at 6
 静默截断会让人以为"游标生效了"，而实际定位到了别的楼层。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **不暴露游标，让 `resolve` 自己猜一个最近楼层**：体验更顺（不用记楼层号）。否决理由：**"楼上"在没有阅读位置时语义上就是不确定的**。`resolve` 的实现刻意在无游标时返回 `ambiguous` 而不是猜一个  注释写着"给出候选让人来定，不替人定"。**猜一个等于编造引用来源**，而引用链的全部价值在于它能指回**具体**楼层。
 - **用 `turnId` 而不是楼层序号**：与内部表示一致，实现更直接。否决理由：**人不会去数 hash**。用序号是"按使用者的心智模型设计接口"而 `resolve` 内部仍然用 id（它需要稳定标识），转换只发生在 CLI 边界这一处。

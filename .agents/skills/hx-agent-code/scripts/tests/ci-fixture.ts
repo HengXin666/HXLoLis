@@ -22,7 +22,7 @@ export function fixture() {
     cpSync(join(example, "ci.json"), join(root, "scripts/quality/ci.json"));
     write("src/value.txt", "ready\n");
     write("docs/guide.md", "# Guide\n");
-    write(".gitignore", ".hx-quality/\nevent.json\n");
+    write(".gitignore", "scripts/.hx_code_quality/\nevent.json\n");
     git("add", ".");
     git("commit", "-qm", "base");
     const base = git("rev-parse", "HEAD");

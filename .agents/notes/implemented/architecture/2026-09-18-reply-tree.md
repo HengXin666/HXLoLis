@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/reply-tree.ts`（新建）、`scripts/sagasu.ts`（`thread` 默认显示树）、`scripts/serve.ts`（`/api/thread` 返回边表）
+Decision-ID: reply-tree
+
+
+## Code
+
+- `components/HX-Sagasu/scripts/serve.ts`
+- `components/HX-Sagasu/src/reply-tree.ts`
 
 ## Problem
 
@@ -48,6 +54,8 @@ Status: implemented
 3. **深度用迭代算**，不用递归  2000 层链的测试锁住了这一点。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **继续平铺，不做树**：省掉一个模块。**否决理由**：**平铺丢的正是引用链的价值**。目标第 (3) 项明确要求"帖子-回复结构"与"引用链" 数据一直在，只是没有承载物。**这与本项目反复出现的"机制在、没呈现"是同一形态**。
 - **只显示引用（`quotedTurnId`），不建父子树**：引用是"回复 @某人"的更精确版本。**否决理由**：**引用是点状的，树是结构性的**。一个引用回答"这条在回哪一条"，但看不出"这一支讨论从哪长出来、有几条分支"。实测 3 个根节点（三个话题分支） 那是只有树才能看出的东西。

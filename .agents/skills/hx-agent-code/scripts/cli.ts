@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { collectScope } from "./core/scope.ts";
 import { parseScope } from "./core/model.ts";
 import { parseGraph, selectTests } from "./core/affected.ts";
-import { makeReport, parseBaseline, parseFindings } from "./core/report.ts";
+import { consoleReport, makeReport, parseBaseline, parseFindings, saveToolError } from "./core/report.ts";
 import { auditCoverage, parseCatalog } from "./core/audit.ts";
 
 function read(path: string): unknown {
@@ -39,6 +39,8 @@ function options(args: string[], allowed: string[], required: string[]): Record<
 
 /**
  * Keep portable analysis separate from project-specific installation
+ *
+
  * .agents/notes/implemented/process/2026-10-07-agent-code-installation-contract.md
  */
 export function main(args: string[]): number {
@@ -64,6 +66,7 @@ export function main(args: string[]): number {
         const report = makeReport(findings, baseline);
         write(flags.out + ".json", report.json);
         write(flags.out + ".md", report.markdown);
+        consoleReport(findings, resolve(flags.out + ".json"));
         return report.exitCode;
     }
     throw new Error("Usage: cli.ts scope|affected|report|audit --key value; see references/runtime.md");
@@ -73,7 +76,10 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     try {
         process.exitCode = main(process.argv.slice(2));
     } catch (error) {
-        process.stderr.write((error instanceof Error ? error.message : String(error)) + "\n");
+        const index = process.argv.indexOf("--out");
+        const requested = index >= 0 ? process.argv[index + 1] : undefined;
+        saveToolError(error, requested && !requested.startsWith("--")
+            ? requested : "scripts/.hx_code_quality/reports/cli-error");
         process.exitCode = 2;
     }
 }

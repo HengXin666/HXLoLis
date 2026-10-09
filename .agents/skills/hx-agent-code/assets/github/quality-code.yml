@@ -29,6 +29,6 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                   name: quality-code-${{ github.run_id }}-${{ github.run_attempt }}
-                  path: .hx-quality/reports/
+                  path: scripts/.hx_code_quality/reports/
                   include-hidden-files: true
                   if-no-files-found: warn

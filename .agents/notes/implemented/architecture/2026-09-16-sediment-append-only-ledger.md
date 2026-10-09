@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/{ledger,index-store,tokenize}.ts`, `components/HX-Sagasu/scripts/ingest-truth.ts`
+Decision-ID: sediment-append-only-ledger
+
+
+## Code
+
+- `components/HX-Sagasu/scripts/ingest-truth.ts`
+- `components/HX-Sagasu/src/ledger.ts`
 
 ## Problem
 
@@ -29,6 +35,8 @@ HX-Sagasu 的第四个目标是"把检索结果沉淀为可复用、可全量重
 配套：`scripts/ingest-truth.ts` 把引擎四态真值表里**非 ok 的行**各沉淀成一张可被人读懂的证据卡（ok 是常态、记它只会淹没异常）。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **账本允许更新/删除**：最符合直觉，也能立刻修正"写错的卡"。否决理由：证据一旦可变，任何引用都不再可信今天引用的话明天可能被改成别的。这与整个系统的前提（"可核查"）直接冲突。
 - **索引增量更新**：性能上压倒性地优，尤其当 Ledger 增长后。否决理由：一旦允许增量修补，索引就会长期偏离真相而无人察觉存量里混着旧分词口径的条目，查不到东西却不报错。这正是"必须全量重建"这条规则要防的失效模式；而全量重建的成本在本地千级卡上是毫秒级，代价不对称。

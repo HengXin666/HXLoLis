@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: .agents/skills/hx-code-quality/SKILL.md, templates/context-layers.md, templates/index.md, templates/profiles/shared.md, steps/, scripts/check-context-layers.ts, scripts/verify-templates.ts, scripts/verify-note-links.ts
+Decision-ID: context-layer-gate-and-ref26-completeness
+
+
+## Code
+
+- `.agents/skills/hx-code-quality/scripts/verify-note-links.ts`
 
 ## Problem
 
@@ -18,7 +23,11 @@ REF-26 (`check-doc-budgets`) 只量注入上下文的**字节数**, 不回答"�
 
 元门禁由 `scripts/verify-templates.ts` 承担: 它断言契约文件被模板入口路由, 并实际调用 `check-context-layers.ts --self-test`; `--self-test` 新增两组探针 (契约未路由、判据脚本被删), 使这条新判据本身也会因改名或删除而红. `scripts/verify-note-links.ts` 从核对单一 note 扩展为核对 note 列表, 本 note 与原 2026-10-02 note 各自双向互链, 二者管不同的决策.
 
+上下文判据保存本次全部诊断并按规则分类统计, 超过 10 项仅展示摘要, 不缩减扫描范围
+
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **沿用外部脚本形态, 不把判据放进本 skill** — 最强理由是目标项目各自的目录约定不同, 自带脚本可能诱导照搬阈值. 否决理由是可运行判据是本 skill 全部主张的落点, 只给方法不给脚本, 就等于回到"写到文档里但从不执行"; 阈值与排除项都是命令行参数, 照搬风险由默认值之外必须填写本仓实测值这条约束兜住.
 - **只补分层, 不补覆盖 (该有而缺失)** — 最强理由是缺失是存量的常态, 加了必然全仓红, 和维护成本不成比例. 否决理由是只判体量时, 根文档删到阈值内即可全绿, 而"子目录没有规则可读"这个真实故障完全不受影响; 棘轮基线正是为承接这批存量而存在.

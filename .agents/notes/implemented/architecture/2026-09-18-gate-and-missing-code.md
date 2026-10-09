@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/argo-gate.ts`（`while` 重检 + 只在有空位时唤醒）、`src/argo-source.ts`（补齐上轮漏掉的 `.catch()`）
+Decision-ID: gate-and-missing-code
+
+
+## Code
+
+- `components/HX-Sagasu/src/argo-gate.ts`
 
 ## Problem
 
@@ -71,6 +76,8 @@ if (running < limit) { const n = queue.shift(); if (n) n() }   // 只在有空�
 **这是两者唯一剩下的结构差异**。而它不该有语义影响。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **继续追那个差异**：更彻底。**否决理由**：本轮 14 轮 + 上轮 13 轮 = **27 轮**。而**每一条新排除都指向"代码没问题"**。**该做的是把已确认的部分固化，并把这个未闭合的现象连同 17 条排除记录留档**  下一个人不必重走。
 - **把 CLI 也改成 `await import()`**（与受控版一致）：可能绕过症状。**否决理由**：**那是让代码去迁就一个未理解的故障**。如果 `await import` 真的改变了行为，那说明的是我们**对模块初始化时序的理解有缺口**  而那需要被理解，不是被绕过。

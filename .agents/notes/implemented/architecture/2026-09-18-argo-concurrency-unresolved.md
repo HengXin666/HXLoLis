@@ -2,8 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/fetchers.ts`（整层补齐避让已登记来源）、`src/argo-source.ts`（握手改懒发）
+Decision-ID: argo-concurrency-unresolved
+
 - **未解决**: 第 1 层的 argo 来源在特定调用形态下大面积超时（见下）
+
+## Code
+
+- `components/HX-Sagasu/src/fetchers.ts`
 
 ## Problem
 

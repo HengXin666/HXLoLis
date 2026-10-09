@@ -1,6 +1,6 @@
 # GitHub 工作流
 
-读 .github/workflows/ 下每条有效 workflow 的事件、路径过滤、permissions、jobs、needs、缓存、超时、条件、产物与退出码. 核对 workflow 是否被触发、失败是否传到最终必需检查; continue-on-error、|| true、跳过 job 和路径过滤需结合具体配置验证, 不能只靠词命中判违规
+读 . github/workflows/ 下每条有效 workflow 的事件、路径过滤、permissions、jobs、needs、缓存、超时、条件、产物与退出码. 核对 workflow 是否被触发、失败是否传到最终必需检查; continue-on-error、|| true、跳过 job 和路径过滤需结合具体配置验证, 不能只靠词命中判违规
 
 将运行过的 job、已配置但未运行的 job、只存在于建议中的 job 区分开. 若能取得 Actions 运行与仓库规则, 关联最近一次通过/失败及必需检查; 否则只画"配置链", 把分支保护标为未知. 建议复用本地可运行的判据, 但只有宿主已经需要共享调度时才引入门禁总线. 正反探针同时覆盖规则本身与工作流接线
 

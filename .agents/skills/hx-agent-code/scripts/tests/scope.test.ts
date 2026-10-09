@@ -19,6 +19,8 @@ function repository() {
 
 /**
  * Exercise Git snapshots in independent temporary repositories
+ *
+
  * .agents/notes/implemented/process/2026-10-07-agent-code-installation-contract.md
  */
 function withRepository(run: (repo: ReturnType<typeof repository>) => void): void {

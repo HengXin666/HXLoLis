@@ -2,8 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/recall.ts`（`queryForSources` 传给取数器）
+Decision-ID: ablation-normalized-query-upstream
+
 - 前情: `2026-09-18-normalize-must-reach-query-terms.md`（上一轮的修复，**不够**）
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
 
 ## Problem
 
@@ -54,6 +59,8 @@ const queryForSources = normalize(parseNegation(query).clean).normalized || quer
 当前状态是**等价**，比"不低于"更强。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **只传归一后的规范形式**（本轮采纳）：请求数不变、结果集不变。代价是"上游只有错字文档"时仍然拿不到（见下方残留缺口）。
 - **把 `variants` 全部并列发出**（"多种写法都搜一遍"）：`normalize.ts` 的文件头正是这么写的（"检索时应当**并列搜索**的写法"）。否决理由：**它会让上游返回错字文档与正确文档的并集**，然后由我们的判据筛  请求数**翻倍**（26 来源 × variants 数），而收益仅覆盖"上游只有错字文档"这一个场景。**当前先做保守版本，等实测发现那个场景常见再改。** 这是可逆的：改一个数组即可。

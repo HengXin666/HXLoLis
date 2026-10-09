@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/fetchers.ts`
+Decision-ID: fetcher-composition-point
+
+
+## Code
+
+- `components/HX-Sagasu/src/fetchers.ts`
 
 ## Problem
 

@@ -4,15 +4,16 @@
 
 | 原文章节 | 技能中的契约 | 验收方式 |
 |---|---|---|
+| 一 总览 性能测试 | HC-PERF, testing 性能一节 | 页面 LCP/CLS/ready 与端点 p95/p99 预算, 缺预算即失败 |
 | 一 总览 | SKILL 完成边界, runtime 检查点/等级 | 显式触发, 一次施工, Warning/Error MD/JSON |
-| 2.1 栈与复用 | HC-STACK/EXT/REUSE/DEPS | 选型证据与依赖人工决策 |
+| 2.1 栈与复用 | HC-STACK/EXT/REUSE/DEPS, 取证推荐方案 | 架构与依赖候选比较, 逐级复用证据, 授权依据与迁移验收 |
 | 2.1.1 架构 | HC-BOUNDARY/DATA/CYCLE/DIR/DIR-MIX/PAIR | 公共接口, fake/real, AST 图, 目录豁免, 请求/路由集合 |
 | 2.1.2 格式 | HC-FORMAT/COMMENT-SPACE/SIZE, runtime 缓存 | 阈值正反例, 写入/Bash 与 commit 接线, commit 清缓存 |
 | 2.1.3 lint | HC-LINT/TYPE | 成熟工具与严格类型实际执行 |
 | 2.1.4 自定义 | HC-PY-IMPORT/PY-CONST/DOCSIG/DOCSYNC | AST 参数/返回值与函数 diff |
 | 2.1.5 注释 | HC-COMMENT/WHY/NOTES | 10 行上限, Why review, 双链 |
-| 2.1.6 库 | HC-DEPS | 包变化 Warning 与新库人工批准 |
-| 2.2 文档 | HC-TEXT/DOCS/DOC-REVIEW/DOCSIZE/CONTRACT | 单主题、目录、ASCII 标点、1500 行、YAML 契约 |
+| 2.1.6 库 | HC-DEPS, 取证审批单 | 包变化 Warning, 标注审批单 ID 或 unapproved |
+| 2.2 文档 | HC-TEXT/DOCS/DOC-REVIEW/DOCSIZE/DOCNAME/CONTRACT | 单主题、目录、ASCII 标点、1500 行、YAML 契约 |
 | 2.3 上下文 | HC-CONTEXT/BUDGET, context 实现 | 配对、严格小于阈值、祖先加注入预算 |
 | 2.4 CI | HC-CI, github 契约 | 三入口, 非短路, 构建产物, 兼容性, 五层测试 |
 | 2.4 AI CR | github 未启用扩展 | 按原文 TODO 保留, 不假装已实现 |

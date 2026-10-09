@@ -2,8 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/url-safety.ts`（新建）、`src/readability.ts`（新建）
+Decision-ID: port-not-fork
+
 - 上游: **argo v2.8.6（MIT License © 2026 taxueseek）** 的 `scripts/url_safety.py` 与 `scripts/readability_extract.py`
+
+## Code
+
+- `components/HX-Sagasu/src/url-safety.ts`
 
 ## Problem
 

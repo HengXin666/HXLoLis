@@ -21,7 +21,7 @@ import type { NodeTypeDef, PortDef } from "@hx/ui";
  * ## 拓展方式
  *
  * 加一个节点 = 往 NODES 里加一条。加一种数据类型 = `reg.type(...)`。
- * 蓝图层不需要任何改动 —— 这就是"轻易拓展"的实际含义:
+ * 蓝图层不需要任何改动  这就是"轻易拓展"的实际含义:
  * 拓展发生在**数据**里, 不在库里。
  */
 
@@ -69,7 +69,7 @@ export const NODES: Record<string, SourcedNodeTypeDef> = {
     type: "kick",
     label: "驱动器 kick",
     category: "1. 启动",
-    description: "while (await this.turn()) —— 一次 turn 返回 true 就再来一轮。执行入口多入: 启动与回路都回到这里",
+    description: "while (await this.turn())  一次 turn 返回 true 就再来一轮。执行入口多入: 启动与回路都回到这里",
     source: "index.js:885",
     execIn: true,
     execOut: ["then"],
@@ -101,13 +101,13 @@ export const NODES: Record<string, SourcedNodeTypeDef> = {
     type: "assemblePrompt",
     label: "组装系统提示词",
     category: "2. 轮次",
-    description: "ctx.systemPrompt.assemble() —— 权威组装 waterfall",
+    description: "ctx.systemPrompt.assemble()  权威组装 waterfall",
     source: "index.js:905",
     execIn: true,
     execOut: ["then"],
     /**
      * 上下文来自 agent 自身 (phase / session), 不是上游某个节点的输出。
-     * 给 default 让它成为可选输入 —— 否则图上会永远挂一个"缺少输入"的红点,
+     * 给 default 让它成为可选输入  否则图上会永远挂一个"缺少输入"的红点,
      * 而实际上没有东西该连进来。
      */
     inputs: [{ id: "ctx", label: "上下文", type: "context", default: null }],
@@ -210,7 +210,7 @@ export const NODES: Record<string, SourcedNodeTypeDef> = {
     type: "stream",
     label: "流式请求",
     category: "3. 步骤",
-    description: "for await (const chunk of stream) —— 每个 chunk 都先 throwIfAborted",
+    description: "for await (const chunk of stream)  每个 chunk 都先 throwIfAborted",
     source: "index.js:1078",
     execIn: true,
     execOut: ["then"],
@@ -264,7 +264,7 @@ export const NODES: Record<string, SourcedNodeTypeDef> = {
     type: "executionMode",
     label: "判定执行模式",
     category: "5. 工具",
-    description: "ctx.tools.executionMode().kind —— 独占调用形成屏障, 并行安全调用进有界滚动池",
+    description: "ctx.tools.executionMode().kind  独占调用形成屏障, 并行安全调用进有界滚动池",
     source: "index.js:527",
     execIn: true,
     execOut: ["exclusive", "parallel"],
@@ -324,7 +324,7 @@ export const NODES: Record<string, SourcedNodeTypeDef> = {
     type: "stepJoin",
     label: "汇合到 step/end",
     category: "6. 轮次收尾",
-    description: "maxTokens 与工具提交两条路汇到同一个 step/end。执行入口多入 —— 两条都要留得下",
+    description: "maxTokens 与工具提交两条路汇到同一个 step/end。执行入口多入  两条都要留得下",
     source: "index.js:996 (finally)",
     execIn: true,
     execOut: ["then"],

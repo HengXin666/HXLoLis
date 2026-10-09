@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/UrMmSjKmoH+B2aWbzkHOIcv76Bg</id>
+  <title>arXiv Query: search_query=all:"protocol"&amp;id_list=&amp;start=0&amp;max_results=2</title>
+  <updated>2026-09-16T15:07:45Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22protocol%22&amp;start=0&amp;max_results=2&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>2</opensearch:itemsPerPage>
+  <opensearch:totalResults>51683</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/1002.1178v1</id>
+    <title>Adaptation of TURN protocol to SIP protocol</title>
+    <updated>2010-02-05T10:11:52Z</updated>
+    <link href="https://arxiv.org/abs/1002.1178v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1002.1178v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>  Today, SIP is a protocol par Excellence in the field of communication over Internet. But, the fact that it belongs to the application layer constitutes a weakness vis-a-vis the NAT traversal. This weakness is due to the way in which the server replies to the requests of clients on the one hand. On the other, it is caused by the dynamic allocation of UDP ports for emission and reception of packets RTP/RTCP. The TURN Protocol may face this weakness. However, its use requires a certain number of exchanges between the clients and a TURN server before establishing the multimedia sessions and this increase the latent time. In this article, we propose to adapt TURN protocol for applications based on SIP protocol such as telephony over Internet, conference video, etc. This adaptation optimises the establishment of multimedia sessions by integrating a manager of TCP connections and multimedia flow controller into SIP Proxy server.</summary>
+    <category term="cs.NI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2010-02-05T10:11:52Z</published>
+    <arxiv:comment>International Journal of Computer Science Issues, IJCSI, Vol. 7, Issue 1, No. 2, January 2010, http://ijcsi.org/articles/Adaptation-of-TURN-protocol-to-SIP-protocol.php</arxiv:comment>
+    <arxiv:primary_category term="cs.NI"/>
+    <arxiv:journal_ref>International Journal of Computer Science Issues, IJCSI, Vol. 7, Issue 1, No. 2, January 2010, http://ijcsi.org/articles/Adaptation-of-TURN-protocol-to-SIP-protocol.php</arxiv:journal_ref>
+    <author>
+      <name>Mustapha Guezouri</name>
+    </author>
+    <author>
+      <name>Ahmed Blaha</name>
+    </author>
+    <author>
+      <name>Mokhtar Keche</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1803.02157v1</id>
+    <title>Kak's three-stage protocol of secure quantum communication revisited: Hitherto unknown strengths and weaknesses of the protocol</title>
+    <updated>2018-03-06T13:14:37Z</updated>
+    <link href="https://arxiv.org/abs/1803.02157v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1803.02157v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Kak's three-stage protocol for quantum key distribution is revisited with special focus on its hitherto unknown strengths and weaknesses. It is shown that this protocol can be used for secure direct quantum communication. Further, the implementability of this protocol in the realistic situation is analyzed by considering various Markovian noise models. It is found that the Kak's protocol and its variants in their original form can be implemented only in a restricted class of noisy channels, where the protocols can be transformed to corresponding protocols based on logical qubits in decoherence free subspace. Specifically, it is observed that Kak's protocol can be implemented in the presence of collective rotation and collective dephasing noise, but cannot be implemented in its original form in the presence of other types of noise, like amplitude damping and phase damping noise. Further, the performance of the protocol in the noisy environment is quantified by computing average fidelity under various noise models, and subsequently a set of preferred states for secure communication in noisy environment have also been identified.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2018-03-06T13:14:37Z</published>
+    <arxiv:comment>Kak's protocol is not suitable for quantum cryptography in presence of noise</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <arxiv:journal_ref>Quantum Information Processing (2018) 17:229</arxiv:journal_ref>
+    <author>
+      <name>Kishore Thapliyal</name>
+    </author>
+    <author>
+      <name>Anirban Pathak</name>
+    </author>
+    <arxiv:doi>10.1007/s11128-018-2001-z</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1007/s11128-018-2001-z" title="doi"/>
+  </entry>
+</feed>

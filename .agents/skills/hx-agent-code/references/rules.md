@@ -2,14 +2,16 @@
 
 这是必审清单, 不因项目没有事故记录而跳过. 每项在项目 coverage.json 中登记 implemented 或 not-applicable, 后者给出可核查证据. 未实现的适用项为 blocked, 不算安装完成. 下表未标 Warning 的项均为 Error
 
+项目专属规则用 `PROJECT-<NAME>` 形式的 ID 登记到 coverage.json, 同样需要等级/checker/正反探针/证据, audit 接受但不替代下表任何一项. 表格行必须保持 `| HC-ID | Error 或 Warning | ...` 的原样格式, audit 发现行数与解析数不一致即失败
+
 每个 ID 对应独立 checker, 允许多个 ID 共用一个解析器. 正反例是最低验收输入, 安装时将它们写成目标项目可执行的 fixture. 语义无法静态确定的情况产出 Warning, 不用关键词猜测升级为 Error
 
 | ID | 等级 | 判据 | 正例 / 反例 |
 |---|---|---|---|
 | HC-STACK | Error | 新建后端优先 Python + async FastAPI + uv, 新建前端限定 React + TS + pnpm; 既有栈登记事实和迁移边界 | 合规新模块 / 新增未经裁决的其他前端栈 |
 | HC-EXT | Error | 禁止手写 js/mjs/cjs, 框架必需入口和独立转译目录精确登记 | TS 源码 / 业务 mjs |
-| HC-REUSE | Warning | review 复用顺序为本项目代码, 标准库, 已用库, 新库 | 复用已用库 / 同功能新增库 |
-| HC-DEPS | Warning | manifest 或 lockfile 中依赖变更交人工评审, 新库引入需用户决定 | 无依赖变化 / 新库或版本变化 |
+| HC-REUSE | Warning | 取证必须产出架构与依赖推荐及逐级复用证据, 满足需求可停在现有实现; 需授权的选择核对已有指令 | 推荐复用现有并给出路径 / 无取证直接新增库 |
+| HC-DEPS | Warning | manifest 或 lockfile 的依赖变化都进 review, 新直接依赖/跨大版本标批准记录 ID 或 unapproved, 补丁/小版本/传递依赖标 review-only, unapproved 优先 | 版本变化且有审批单 / 新库无审批单 |
 | HC-BOUNDARY | Error | AST 导入解析后, 跨业务模块只能访问公共接口或显式公共工具/常量/类型库 | a/impl 调 a/public / b/impl 调 a/impl |
 | HC-DATA | Error | API 经可替换端口访问数据, fake 与 real 实现分开, API/业务层禁止直接导入数据库或远程 SDK | port 注入 / router 直连 DB |
 | HC-CYCLE | Error | 依赖图无未声明边界的环, 动态解析失败显式报告 | DAG / a 调 b 且 b 调 a |
@@ -31,10 +33,12 @@
 | HC-DOCS | Error | 当前事实 reference, 原因 decisions, 不造 v2 副本, 失效内容 archive; 路径/重复权威/命名规则机械检查 | 更新原文 / 新建同主题 v2 |
 | HC-DOC-REVIEW | Warning | 单一主题, 上下层重复, 文档是否仍成立的语义待 review | 当前契约 / 疑似过时叙述 |
 | HC-DOCSIZE | Error | 文档最多 1500 行 | 1500 / 1501 |
+| HC-DOCNAME | Error | docs 下目录与文件名为小写 kebab `^[a-z0-9]+(-[a-z0-9]+)*$`, 文档扩展名限 md/mdx/yaml; 禁止 `v[0-9]+` 及 final/copy/bak/tmp/draft 独立词段, new/old 可作业务主题词, 同主题副本由 HC-DOCS 判断; 日期前缀只允许 decisions 下 `YYYY-MM-DD-<slug>`; `reference/api/<module>.yaml` 的 module 必须在模块表中; 精确允许 `README.md`, `AGENTS.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `LICENSE`, `LICENSE.md`, `SECURITY.md`; 项目必需其他扩展名或名称须登记精确路径及原因; archive 保留原名 | tutorials/local-setup.md, reference/api/user.yaml / Setup_Guide.md, api-v2.md, 2026-10-01-notes.md 位于 reference |
 | HC-CONTEXT | Error | 每处 README.md 与 AGENTS.md 双向配对, AGENTS 严格少于 150 行且少于 16384 bytes | 149 行 / 150 行 |
 | HC-BUDGET | Error | 每个文件祖先 AGENTS 加实际 skill 注入预算不超过 65536 bytes | 等于上限 / 超过 1 byte |
 | HC-NOTES | Error | 委托 hx-agent-notes 的 AST 双链及同次 diff 配对检查 | 合法双向锚点 / 单边变化 |
 | HC-TEST | Error | 业务模块内按层组织, affected 选择可靠, 缺命令/环境不能假 PASS | 正常执行 / 缺所需测试层 |
+| HC-PERF | Error | 前端每个路由页面在 e2e/perf 中断言首屏加载, 后端每个契约端点在 backend/api/perf 中断言响应延迟与正确响应; 预算登记在 scripts/quality/perf.json, 缺预算条目/超预算/无法测量都失败 | 页面 p75 LCP 2400ms 且预算 2500ms / 新路由无预算或 p95 超预算 |
 | HC-CONTRACT | Error | docs/reference/api 的 YAML 契约和实现匹配, 契约变化触发相关模块及契约测试 | 同步类型 / 只改 YAML |
 | HC-CI | Error | GitHub 三个 push/PR 入口, diff 质量/文档, push affected 与 PR 全量测试, 非短路汇总 | 后续 job 仍运行 / 首错中断其他检查 |
 | HC-COLLAB | Error | GitHub Bug/Feature Issue 模板, PR 模板, CODEOWNERS, CONTRIBUTING 有实际内容和有效归属 | 有效 owner / 猜造用户名 |
@@ -47,4 +51,5 @@
 - 不强制每个简单函数写冗余注释. 若无文档且无公开接口文档要求, HC-DOCSIG 不凭空造注释
 - HC-DOCS 中的语义要求由 HC-DOC-REVIEW 汇总, 可机械认定的问题保留 Error. HC-DIR-MIX 不能凭 AI 直觉变成阻断
 - Python 推荐不能变成强制迁移旧项目的授权. 记录存量栈, 新前端采用 React + TS 的要求不被静默豁免; 用户另有明确约束时写明差异
+- HC-PERF 的测量方法与默认预算见 references/testing.md 的性能一节; 放宽预算与 baseline 同等对待, 由元门禁从可信基准差分发现
 - 目录豁免用 `{ "path": "src/user", "reason": "同一职责", "expires_on_change": true }`, 同时保存批准时内容摘要. 目录再次变更即失效并重新检查, 不能自动刷新摘要

@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/{recall,authoritative,authoritative-tech}.ts`
+Decision-ID: sufficiency-evidence-chain
+
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
 
 ## Problem
 
@@ -38,6 +43,8 @@ Status: implemented
 4. 新增 `scripts/test.sh` 级别的守卫测试：登记表不允许重复 id、`SOURCES` 与实现表双向一一对应、每个来源一次召回最多被取一次。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **只用字符系统判据就够了**：实现只要十几行，且确实抓到了"中文查询 → 一屏英文结果"这一族失效。**实测否决**：线上确认它**抓不到**真正的那个案例Crossref 返回的是中文论文，文字系统是匹配的。判据通过、系统仍停在 L0。保留它（它消掉了一族），但注释与测试都写明**能力边界**，避免后人以为问题已解决。
 - **做语义相关性判断（embedding 相似度）来决定够不够**：这是真正能解决问题的方向。否决理由：本组件目前不引入任何模型依赖（零依赖设计），且一个不可解释的相似度分数会重新引入"分高优先"那正是上一轮明确否决的。它是后续工作，不是本轮该偷偷塞进来的东西。

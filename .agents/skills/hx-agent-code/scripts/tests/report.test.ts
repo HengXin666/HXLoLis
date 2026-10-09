@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { fingerprint, makeReport, parseFindings, parseBaseline } from "../core/report.ts";
+import { consoleReport, fingerprint, makeReport, parseFindings, parseBaseline } from "../core/report.ts";
 import { auditCoverage, parseCatalog } from "../core/audit.ts";
 import { main } from "../cli.ts";
 import type { Finding } from "../core/model.ts";
@@ -57,6 +57,13 @@ test("coverage catches missing, duplicate, blocked and evidence-free rules", () 
     assert(auditCoverage([{ ...rows[0], evidence: "" }, ...rows.slice(1)], catalog).length > 0);
     assert(auditCoverage([{ ...rows[0], severity: "warning" }, ...rows.slice(1)], catalog).length > 0);
     assert.throws(() => parseCatalog(""));
+    assert.equal(auditCoverage([...rows, {...rows[0], id: "PROJECT-CACHE"}], catalog).length, 0);
+    assert(auditCoverage([...rows, {...rows[0], id: "PROJECT--"}], catalog).length > 0);
+    for (const malformed of ["| HC-B | **Error** | y |", "| `HC-B` | Error | y |", "  | HC-B | Error | y |"] ) {
+        assert.throws(() => parseCatalog("| HC-A | Error | x |\n" + malformed), /Malformed/);
+    }
+    assert.throws(() => parseCatalog("| HC-A | Error | x |\n| **HC-B** | Error | y |\n"), /Malformed/);
+    assert.throws(() => parseCatalog("| HC-A | Error | x |\n| HC-B | error | y |\n"), /Malformed/);
 });
 
 test("CLI writes both report formats and rejects unknown options", () => {
@@ -72,5 +79,30 @@ test("CLI writes both report formats and rejects unknown options", () => {
         assert.throws(() => main(["report", "--input", input]));
     } finally {
         rmSync(root, { recursive: true, force: true });
+    }
+});
+
+/**
+ * Capture user-facing output at the report threshold
+ * .agents/notes/implemented/process/2026-10-10-gates-save-full-reports.md
+ */
+function captureReport(count: number): string {
+    const original = console.log;
+    const lines: string[] = [];
+    console.log = (...args) => { lines.push(args.join(" ")); };
+    try {
+        consoleReport(Array.from({ length: count }, (_, i) => finding("detail-" + i)), "review.json");
+    } finally {
+        console.log = original;
+    }
+    return lines.join("\n");
+}
+
+test("reports expand ten findings and summarize eleven without losing stored findings", () => {
+    for (const count of [0, 10, 11]) {
+        const text = captureReport(count);
+        assert.equal(text.includes("detail-0"), count > 0 && count <= 10);
+        assert(text.includes(count + " 项问题"));
+        assert.equal(makeReport(Array.from({ length: count }, (_, i) => finding("detail-" + i)), []).json.findings.length, count);
     }
 });

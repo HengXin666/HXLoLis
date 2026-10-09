@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/recall.ts`（`source-started` 事件）、`scripts/sagasu.ts`（`--explain` 时间线）、`src/argo-source.ts`（握手失败不缓存）
+Decision-ID: execution-timeline
+
+
+## Code
+
+- `components/HX-Sagasu/scripts/sagasu.ts`
+- `components/HX-Sagasu/src/recall.ts`
 
 ## Problem
 
@@ -53,6 +59,8 @@ Status: implemented
 ```
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **给握手加即时重试**（失败就立刻重发）：看起来最直接。**实测否决**  它让一次召回从 **25s 变成 175s**（每个失败都要等满 15 秒握手超时）。改为**"置 null 但不立即重试"**：让**下一次**（而不是同一个调用）有机会重试。
 - **只加事件，不做 `--explain`**：省掉一个 CLI 开关。**否决理由**：**事件是给程序的，时间线是给人看的**。而这件事（区分慢与排队）恰恰是**人看才有效**  程序拿不到"正常应该多快"这个基准。

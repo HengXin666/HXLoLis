@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/query-variants.ts`（新建）、`src/recall.ts`（接线 + `variants` 消融开关）
+Decision-ID: query-variants
+
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
 
 ## Problem
 

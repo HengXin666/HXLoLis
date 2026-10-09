@@ -2,8 +2,14 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/recall.ts`（`evidenceBlocksOf` + 层内第三维分档）、`components/HX-Sagasu/src/authoritative.ts`（限流提示）、`components/HX-Sagasu/scripts/page.ts`（证据块展示）
+Decision-ID: learning-from-argo
+
 - 上游: 精读 `~/.local/share/hx-sagasu/argo` v2.8.6（91 个 Python 文件 / 38005 行），结论落在 `research-output/hx-sagasu/2026-09-18-argo-source-reading.md`
+
+## Code
+
+- `components/HX-Sagasu/scripts/page.ts`
+- `components/HX-Sagasu/src/recall.ts`
 
 ## Problem
 
@@ -42,6 +48,8 @@ argo 的做法更彻底  用 `_quota_ratio` 在**路由阶段**就降低即将�
 **理由同第 18 轮**：能被看见本身就是验证手段。只显示"有/没有内容"看不出质量差异。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **照搬 argo 对纯 Q&A 格式的 −0.08 扣分**：argo 有它的 GEO 语料实测支撑。否决理由：**我们没有那个实测**。照搬一个没有本机证据支持的扣分，正是本项目反复否决的形态。改为**只如实统计 `isQaFormat`、不扣分**，把判断留给调用方。测试显式锁住"两段内容逐字相同时，加不加 Q/A 标记密度必须相等"。
 - **把 argo 的 `credibility = 0.40S + 0.35A + 0.15F + 0.10O` 整体搬过来**：它工程上很完整。否决理由：**最后一项 `original × 0.10` 是引擎自报分，跨来源不可比**，这是我们第一轮就立的铁律。但**要区分**：`selection`/`absorption` 是 argo 自己算的、跨来源可比的**特征**（该学），`original` 是引擎自报**分数**（该拒）。本轮只取了 `absorption` 那一维。

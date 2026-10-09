@@ -1,2 +1,6 @@
 ref/
 .vscode/
+.gate-reports/
+scripts/.hx_code_quality/
+__pycache__/
+*.pyc

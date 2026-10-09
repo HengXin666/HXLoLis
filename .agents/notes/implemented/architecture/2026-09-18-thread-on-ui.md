@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/scripts/serve.ts`（`/api/thread`）、`scripts/page.ts`（对话面板）
+Decision-ID: thread-on-ui
+
+
+## Code
+
+- `components/HX-Sagasu/scripts/page.ts`
 
 ## Problem
 

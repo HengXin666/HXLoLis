@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/recall.ts`、`components/HX-Sagasu/src/adapters/adapter.ts`、`components/HX-Sagasu/src/fetchers.ts`
+Decision-ID: applicability-is-not-failure
+
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
+- `components/HX-Sagasu/src/adapters/adapter.ts`
 
 ## Problem
 

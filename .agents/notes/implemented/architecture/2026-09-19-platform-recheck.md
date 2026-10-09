@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/adapters/registry.ts`（给 weibo/tieba 补 09-19 复核实测）
+Decision-ID: private-platform-reachability-recheck
+
+
+## Code
+
+- `components/HX-Sagasu/src/adapters/registry.ts`
 
 ## Problem
 
@@ -57,6 +62,8 @@ X.com / Discord / Reddit / YouTube  ✖
 否则下一个看到 `HTTP 200` 的人（可能就是几轮后的我）会重走一遍。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **保留「6/10 可达」这个结论**：它是实测的，且数字好看。**否决理由**：**它是误读** 
   主页可达不等于**内容可取**，而需求 (2) 要的是**内容**。

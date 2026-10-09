@@ -1,0 +1,56 @@
+[
+    {
+        "id": "APR-dependency-zod",
+        "kind": "dependency",
+        "subject": "zod@<查证后的版本范围>",
+        "need": "frontend/api/user.ts 需要运行期校验后端响应",
+        "reuse": {
+            "project": "src/shared/validate.ts 只做必填检查, 不支持嵌套结构",
+            "stdlib": "TS 类型在运行期不存在",
+            "existing": "package.json 已有依赖中无 schema 校验库"
+        },
+        "candidates": [
+            {
+                "name": "zod",
+                "license": "MIT",
+                "lastRelease": "<填写>",
+                "activity": "<填写>",
+                "size": "<填写>",
+                "advisories": "<填写>",
+                "compat": "支持 TS strict",
+                "source": "<官方发布与安全公告 URL>",
+                "checkedAt": "<查证日期>"
+            },
+            {
+                "name": "valibot",
+                "license": "MIT",
+                "lastRelease": "<填写>",
+                "activity": "<填写>",
+                "size": "<填写>",
+                "advisories": "<填写>",
+                "compat": "支持 TS strict",
+                "source": "<官方发布与安全公告 URL>",
+                "checkedAt": "<查证日期>"
+            }
+        ],
+        "choice": {
+            "pick": "zod",
+            "reason": "<填写>",
+            "rollback": "移除依赖并恢复 validate.ts"
+        },
+        "impact": {
+            "files": [
+                "frontend/api/user.ts"
+            ],
+            "steps": [
+                "pnpm add zod"
+            ],
+            "tests": [
+                "user:frontend-api"
+            ]
+        },
+        "status": "proposed",
+        "approvedBy": "",
+        "authorization": ""
+    }
+]

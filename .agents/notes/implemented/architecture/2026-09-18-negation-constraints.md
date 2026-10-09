@@ -2,8 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/recall.ts`（`parseNegation` / `negationPenalty` / `queryTerms` / 层内第四维）
+Decision-ID: negation-constraints
+
 - 上游: 精读 argo `query_understanding.parse_negation`（`query_understanding.py:84`）
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
 
 ## Problem
 
@@ -46,6 +51,8 @@ argo 的引擎可以借，但"怎么理解用户说的话"不该外包。
 命中里出现排除词 → 降档。**只降档不丢弃。**
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **把排除词从查询里删掉就完事**：一行改动，最省事。否决理由：那样 `不要广告的图片压缩工具` 会退化成 `图片压缩工具`，而**"不含广告"这个约束丢失了**  用户明确表达的意图被静默丢掉。排除词必须参与排序。
 - **命中排除词就丢弃**：语义最"干净"。否决理由：**"含该词"未必等于"是关于它"**。一篇《广告之外：图片压缩工具横评》含"广告"却是好结果。丢弃会误杀，而降档保留了它。测试显式锁住"含排除词的那条仍然保留"。

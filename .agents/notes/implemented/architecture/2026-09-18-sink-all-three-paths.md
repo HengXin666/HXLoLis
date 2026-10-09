@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/sink.ts`（`sinkThread` / `MIN_QUOTE_CHARS`）、`scripts/sagasu.ts`（`thread` 与 `fetch` 都接沉淀）
+Decision-ID: sink-all-three-paths
+
+
+## Code
+
+- `components/HX-Sagasu/scripts/sagasu.ts`
+- `components/HX-Sagasu/src/sink.ts`
 
 ## Problem
 

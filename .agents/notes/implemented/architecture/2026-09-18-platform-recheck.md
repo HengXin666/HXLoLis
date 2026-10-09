@@ -2,7 +2,14 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/argo-source.ts`（`bilibili_hot`）、`src/recall.ts`（`SOURCES` 44→45）、`src/fetchers.ts`、`tests/registry-consistency.test.ts`、`src/adapters/registry.ts`（知乎复核）
+Decision-ID: platform-recheck
+
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
+- `components/HX-Sagasu/src/adapters/registry.ts`
+- `components/HX-Sagasu/tests/registry-consistency.test.ts`
 
 ## Problem
 
@@ -52,6 +59,8 @@ zhihu_hot      "热搜"            → 0 条
 **登记来源 44 → 45。**
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **不复核，沿用 09-16 的判定**：省掉一整轮的工作。**否决理由**：**那种判定是"单查询探测"得出的**，而本项目对"未实测的假设"一贯拒绝。更实际的是：本轮**顺手就发现了一个可用来源**（`bilibili_hot`） 说明当时确实漏了东西。
 - **把 `bilibili_hot` 合并进 `bilibili` 条目**（反正都是 B站）：登记表更简洁。**否决理由**：它们是**两条独立路径**（榜单 vs 关键词检索），产出内容不同、失败模式也不同。合并会让"B站可用"这句话**掩盖**其中一条路径坏掉。**按路径登记，不按平台聚合**  这与 registry 文件头"按平台登记而不是按引擎数量"的规则不冲突：那条防的是"4 个引擎变体算 4 份覆盖"，而这里是**真的两条路**。

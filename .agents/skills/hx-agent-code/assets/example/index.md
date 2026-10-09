@@ -1,6 +1,6 @@
 # 可运行接线示例
 
-此示例用于证明 CI runner、真实命令、影响计划、构建产物和报告能串起来, 不是 33 条项目规则的实现. 只有一个文本值检查和一个测试, 不用它替代目标项目适配器
+此示例用于证明 CI runner、真实命令、影响计划、构建产物和报告能串起来, 不是规则目录中任何一条项目规则的实现. 只有一个文本值检查和一个测试, 不用它替代目标项目适配器
 
 - `ci.json`: 复制到临时 Git 仓库的 scripts/quality/ci.json, 定义各组命令与 test ID
 - `task.ts`: 复制到临时仓库的 scripts/quality/task.ts, 执行示例 checker/build/test/graph

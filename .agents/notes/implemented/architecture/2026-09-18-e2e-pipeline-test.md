@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/tests/e2e-pipeline.test.ts`（新建，6 条）
+Decision-ID: e2e-pipeline-test
+
+
+## Code
+
+- `components/HX-Sagasu/tests/e2e-pipeline.test.ts`
 
 ## Problem
 
@@ -75,6 +80,8 @@ Status: implemented
 > 第一次那个变异即使测试是空的也会通过。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **不写这个文件，靠现有 15 个测试文件的 260+ 条测试**：数量上已经很多。**否决理由**：**数量不等于覆盖链**。实测已经证明 `planFetchers` 与 `sink` 分处两个文件、互不相见。而"链断了"正是本项目栽过四次的那个坑。
 - **把端到端断言塞进现有文件**（如加到 `sink.test.ts`）：少一个文件。**否决理由**：`sink.test.ts` 的职责是"**卡片构造正确**"，而"整条链通不通"是**另一个关注点**。混在一起会让两个关注点的失败互相掩盖  而**单独一个文件的名字本身就是文档**（`e2e-pipeline`）。

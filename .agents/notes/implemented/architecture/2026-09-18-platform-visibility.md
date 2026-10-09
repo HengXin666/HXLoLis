@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/adapters/registry.ts`（补 4 条实测结论 + 去掉 1 条重复）、`scripts/serve.ts`（`/api/platforms`）、`scripts/page.ts`（平台面板）
+Decision-ID: platform-visibility
+
+
+## Code
+
+- `components/HX-Sagasu/scripts/page.ts`
+- `components/HX-Sagasu/src/adapters/registry.ts`
 
 ## Problem
 
@@ -51,6 +57,8 @@ Status: implemented
 `unlock` 同样重要：不写它，下一个人只会重走一遍已经走过且失败的路。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **把这些判定留在代码注释里**：省掉一个端点和一块 UI。否决理由：**注释不会出现在任何人的屏幕上**。而"12 个平台只有 2 个可用"是**决策级事实**  它决定了第 (2) 项需求的现实进度。埋在 `registry.ts` 第 90 行，等于没写。
 - **只在 CLI 加一个 `sagasu platforms` 子命令**：实现更省。否决理由：**界面才是"让人看见"的地方**。CLI 输出是一次性的、滚过就没了；面板是**常驻的静态现实**，随时可看。两者不冲突  但先做面板。

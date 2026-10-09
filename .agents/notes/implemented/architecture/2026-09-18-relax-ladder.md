@@ -2,8 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/recall.ts`（`relaxSteps`）
+Decision-ID: relax-ladder
+
 - 上游: 精读 argo `recovery.py` 的 `structured_relax_steps`（`recovery.py:152`）
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
 
 ## Problem
 
@@ -31,6 +36,8 @@ argo 的 `structured_relax_steps` 解了这个问题：**每步只撤一类条�
 把一个来源的失败变成另一个来源的请求，语义不同，必须由调用方决定。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **照搬 argo 的七层阶梯**：它经过实测调优。否决理由：**它的七层对应它支持的七类平台语法**（X 的 `min_faves:`、GitHub 的 `repo:`、Reddit 的 `subreddit:`…），**我们只有三类**。照搬会产出四个永远为空的步骤  界面上显示"试了 7 种策略"，实际只有 3 种存在。**那是假的能力，比没有更坏**（它让人以为已经尽力了）。**阶梯的层数必须等于真实支持的语法数。**
 - **把阶梯做成"自动在 recall 内部重试"**：调用方无感，最省事。否决理由：**那会让"归零"这件事被静默掩盖**。我们的契约是"失败必须可见"，而自动重试会让调用方永远不知道原始查询是坏的  它只看到"有结果"。**阶梯必须由调用方显式驱动**，且每一步的结果要能报出来。

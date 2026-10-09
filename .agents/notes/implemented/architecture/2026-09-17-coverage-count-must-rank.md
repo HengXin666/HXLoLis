@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/recall.ts`（层内排序）、`components/HX-Sagasu/scripts/{serve,page}.ts`（新增界面）、`components/HX-Sagasu/scripts/sagasu.ts`（新增 CLI）
+Decision-ID: coverage-count-must-rank
+
+
+## Code
+
+- `components/HX-Sagasu/scripts/page.ts`
+- `components/HX-Sagasu/src/recall.ts`
 
 ## Problem
 

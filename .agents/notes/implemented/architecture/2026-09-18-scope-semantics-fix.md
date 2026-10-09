@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/recall.ts`（`requiredScope` 判定）
+Decision-ID: scope-semantics-fix
+
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
 
 ## Problem
 
@@ -50,6 +55,8 @@ failure: telegram-public not-applicable
 **告诉用户怎么写**，而不只是说缺什么。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **把测试改成传 `['durov']`，让 `recall` 的判据不变**：改动最小。**否决理由**：**那会把 bug 固化进测试**。真实调用方给的就是频道名，测试顺着错实现写只会让它更难被发现。**测试要照真实用法写**（这与第 26 轮"测试断言必须照着实测写，否则测的是我的想象"是同一族，方向相反但道理相同）。
 - **让 `requiredScope` 的语义变成"必须是这些值之一"**（即承认 `['durov']` 非法）：保持现有实现。**否决理由**：**频道名是无界的**，不可能枚举进 `requiredScope`。而且 `isApplicable`（另一份实现）已经用"非空即适用"表达了正确的语义  **两份实现不一致时，该改的是那个更严的，除非能证明严的那个对**。这里证明不了。

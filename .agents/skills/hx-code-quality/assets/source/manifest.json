@@ -1,22 +1,26 @@
 {
   "version": 1,
-  "source": "weuinevolveweb snapshot 2026-10-02 @ 79c9a5b (claims from supplied source, not runtime-verified)",
+  "source": "weuinevolveweb snapshot 2026-10-02 @ 79c9a5b (upstream attribution from supplied source; upstream bytes not verified)",
   "sources": [
     {
       "path": "assets/source/README.md",
-      "sha256": "8b350a3b818a81fa58e63462191aebb54bf7e60ad6e31a40f2f8fd4b2f9b949d"
+      "sha256": "6d9169a1981547c2caed88513dd43e0cad7768027af49f9c2a97fffe9db9bf22",
+      "suppliedSha256": "8b350a3b818a81fa58e63462191aebb54bf7e60ad6e31a40f2f8fd4b2f9b949d"
     },
     {
       "path": "assets/source/artifacts.md",
-      "sha256": "615298a8607f551553462d2bce436137e15d63b06ddf36521aab50114755d495"
+      "sha256": "d692b9a2464e3fcd91cb54bd797465b2371797af5724f210597bc35279f8dabd",
+      "suppliedSha256": "615298a8607f551553462d2bce436137e15d63b06ddf36521aab50114755d495"
     },
     {
       "path": "assets/source/reference-params.md",
-      "sha256": "b19d07f3ea960fe2bfeacde608161e2d59f458ab947789bcbc67384f02029a1c"
+      "sha256": "2c0ca01cdef33c51e6c361a34cd93293da5540de9d0b0989d4863f6b18d610ad",
+      "suppliedSha256": "b19d07f3ea960fe2bfeacde608161e2d59f458ab947789bcbc67384f02029a1c"
     },
     {
       "path": "assets/source/skeletons.md",
-      "sha256": "08861a8b1d882f54c05f4dd6962e9a3e7995e2809e3863fb48c5706f9498fc37"
+      "sha256": "68e19cea78f604f5e16134b60ef31ff42810f50bfb1e44f992121b6e09bc7f15",
+      "suppliedSha256": "08861a8b1d882f54c05f4dd6962e9a3e7995e2809e3863fb48c5706f9498fc37"
     }
   ],
   "skeletons": [
@@ -24,99 +28,113 @@
       "id": 1,
       "path": "templates/skeletons/01-bus.md",
       "title": "## 1. `run.mjs`  门禁总线",
-      "sourceSectionSha256": "d725b733399a55db1a0d783f81c991f1ead5d17875ffe7eb49281f493262d1ec",
-      "mode": "preserved"
+      "sourceSectionSha256": "827fb52deeab96ca0b81cd2fd0738843f0620c0c468623d7ab943af0573a0707",
+      "mode": "preserved",
+      "suppliedSectionSha256": "d725b733399a55db1a0d783f81c991f1ead5d17875ffe7eb49281f493262d1ec"
     },
     {
       "id": 2,
       "path": "templates/skeletons/02-check.md",
       "title": "## 2. 一条判据(门禁脚本)骨架",
-      "sourceSectionSha256": "49ead2a91fe2ff319bd045f9806f74cf7a138f16ebe079d29b67dd5ce11be5aa",
-      "mode": "preserved"
+      "sourceSectionSha256": "af306a12af3dd52860762c62fc25fe8c4951b69a9cab581ccf571c23431b8acc",
+      "mode": "preserved",
+      "suppliedSectionSha256": "49ead2a91fe2ff319bd045f9806f74cf7a138f16ebe079d29b67dd5ce11be5aa"
     },
     {
       "id": 3,
       "path": "templates/skeletons/03-probes.md",
       "title": "## 3. 负向探针骨架",
-      "sourceSectionSha256": "078d7ea439d614e0b8b0cf42d6e5fa925684155b13aea0d465d06d8314e35b5c",
-      "mode": "preserved"
+      "sourceSectionSha256": "d702d5b4238df7c6518c3bac3882db65de8ea37cb6566e1c1d8a3ff0cfcebd67",
+      "mode": "preserved",
+      "suppliedSectionSha256": "078d7ea439d614e0b8b0cf42d6e5fa925684155b13aea0d465d06d8314e35b5c"
     },
     {
       "id": 4,
       "path": "templates/skeletons/04-fingerprint.md",
       "title": "## 4. 指纹快照",
-      "sourceSectionSha256": "a1aadd38a962c8f8ab94fbe42c8e7204548ae0e9ef3a2af0c4094ced53a7cfd1",
-      "mode": "preserved"
+      "sourceSectionSha256": "00c0454699f814f57be5eb672562d04c90f41e94e97efc564f869b57be53130a",
+      "mode": "preserved",
+      "suppliedSectionSha256": "a1aadd38a962c8f8ab94fbe42c8e7204548ae0e9ef3a2af0c4094ced53a7cfd1"
     },
     {
       "id": 5,
       "path": "templates/skeletons/05-ratchet.md",
       "title": "## 5. 棘轮基线",
       "sourceSectionSha256": "3f8dee474913f2888adfd62b2e6b26fffe38a4621232363ff98ae8cda291dd6e",
-      "mode": "preserved"
+      "mode": "preserved",
+      "suppliedSectionSha256": "3f8dee474913f2888adfd62b2e6b26fffe38a4621232363ff98ae8cda291dd6e"
     },
     {
       "id": 6,
       "path": "templates/skeletons/06-whitelist.md",
       "title": "## 6. 白名单语法与两条铁律",
-      "sourceSectionSha256": "f474185947cecc09b67ca279f562e5f80b57aa40d9af24796c48225e1e3144ae",
-      "mode": "preserved"
+      "sourceSectionSha256": "3c43276e1bdafad7d8845eaaf6e56a7d879f5267ec1b4478d5e539aac8fbe0cf",
+      "mode": "preserved",
+      "suppliedSectionSha256": "f474185947cecc09b67ca279f562e5f80b57aa40d9af24796c48225e1e3144ae"
     },
     {
       "id": 7,
       "path": "templates/skeletons/07-lanes.md",
       "title": "## 7. lane 表 + Stop hook",
-      "sourceSectionSha256": "15cc54ea580f856ff20f610a07ce1ce929a8fa3438171a018dede500ef48e5c0",
-      "mode": "preserved"
+      "sourceSectionSha256": "d1d1add37f2d7a1bf3ecad8cac17a8eba8234988340268b8380e3e3ad6c8415e",
+      "mode": "preserved",
+      "suppliedSectionSha256": "15cc54ea580f856ff20f610a07ce1ce929a8fa3438171a018dede500ef48e5c0"
     },
     {
       "id": 8,
       "path": "templates/skeletons/08-agent-hooks.md",
       "title": "## 8. agent hook 注册",
-      "sourceSectionSha256": "64a23cad74e4e46c17b327cc4fbfa65f8946b361356a3ea5635236aa73f2ec29",
-      "mode": "preserved"
+      "sourceSectionSha256": "fe03d28b8e0c517cd8fcb8ba6f60e1de08e9e646e2d574cc1a46d97397e27ed6",
+      "mode": "preserved",
+      "suppliedSectionSha256": "64a23cad74e4e46c17b327cc4fbfa65f8946b361356a3ea5635236aa73f2ec29"
     },
     {
       "id": 9,
       "path": "templates/skeletons/09-git-hooks.md",
       "title": "## 9. `lefthook.yml`",
       "sourceSectionSha256": "98c5cf47668060ef503d968e4ec7685a3f9ae7000624e1d707985ceedf6dcb65",
-      "mode": "preserved"
+      "mode": "preserved",
+      "suppliedSectionSha256": "98c5cf47668060ef503d968e4ec7685a3f9ae7000624e1d707985ceedf6dcb65"
     },
     {
       "id": 10,
       "path": "templates/skeletons/10-ci.md",
       "title": "## 10. `.ci.yml`",
-      "sourceSectionSha256": "db5e44022bb749cb6f6e8d3db335dc72626ee74d5f737ffcbda5ca2f73a17e08",
-      "mode": "preserved"
+      "sourceSectionSha256": "6edaf7f2868b5747b21410d9cc50a64d85d7c44bb83e0a5df7904f7b39cd57b3",
+      "mode": "preserved",
+      "suppliedSectionSha256": "db5e44022bb749cb6f6e8d3db335dc72626ee74d5f737ffcbda5ca2f73a17e08"
     },
     {
       "id": 11,
       "path": "templates/skeletons/11-notes.md",
       "title": "## 11. 决策记录骨架",
-      "sourceSectionSha256": "884080b51800b0fc6731a60d0fa77bc01fbed658ca689c6d6642aceb69c9ef4e",
-      "mode": "delegate"
+      "sourceSectionSha256": "d27d5754e761290f9488f4fc7b81312f3df476dbd6f36fd26ce1bca61797398f",
+      "mode": "delegate",
+      "suppliedSectionSha256": "884080b51800b0fc6731a60d0fa77bc01fbed658ca689c6d6642aceb69c9ef4e"
     },
     {
       "id": 12,
       "path": "templates/skeletons/12-incidents.md",
       "title": "## 12. 事故规则表",
-      "sourceSectionSha256": "a2f5d17fa4266381a69890315fccfea1a57ea6e4df94586e66e96c860b8f450a",
-      "mode": "preserved"
+      "sourceSectionSha256": "fe570d48ddd76aa67e908f4e78b4c33623a3e7b192fa75b5772e65ebd70466c3",
+      "mode": "preserved",
+      "suppliedSectionSha256": "a2f5d17fa4266381a69890315fccfea1a57ea6e4df94586e66e96c860b8f450a"
     },
     {
       "id": 13,
       "path": "templates/skeletons/13-context-budget.md",
       "title": "## 13. 文档体量预算",
       "sourceSectionSha256": "cf670cc4952afec4527f627151defa89495287c03b6593ff0dc79de57e81b0c1",
-      "mode": "preserved"
+      "mode": "preserved",
+      "suppliedSectionSha256": "cf670cc4952afec4527f627151defa89495287c03b6593ff0dc79de57e81b0c1"
     },
     {
       "id": 14,
       "path": "templates/skeletons/14-guide.md",
       "title": "## 14. 导览文档",
-      "sourceSectionSha256": "bd640ca28bb9e92dd1b61e4ffcd9a150ef25b7ed1664c39ae7cf7dac0156af47",
-      "mode": "preserved"
+      "sourceSectionSha256": "9c25178e1fff3b2e63d98c02b6b1c68adf6e8bcd711542f66ef864ce8b15cb03",
+      "mode": "preserved",
+      "suppliedSectionSha256": "bd640ca28bb9e92dd1b61e4ffcd9a150ef25b7ed1664c39ae7cf7dac0156af47"
     }
   ],
   "profiles": [
@@ -166,5 +184,7 @@
         31
       ]
     }
-  ]
+  ],
+  "snapshotCommit": "81a7eec77cf02e74d8a7e6a5f2f109d15cf73093",
+  "digestScope": "repository-committed-text"
 }

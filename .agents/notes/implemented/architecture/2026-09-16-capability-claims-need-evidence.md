@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/adapters/telegram.ts`、`components/HX-Sagasu/tests/registry-consistency.test.ts`
+Decision-ID: capability-claims-need-evidence
+
+
+## Code
+
+- `components/HX-Sagasu/src/adapters/telegram.ts`
+- `components/HX-Sagasu/tests/registry-consistency.test.ts`
 
 ## Problem
 
@@ -55,6 +61,8 @@ for (const id of reg) {
    - **新增**：同一条来源不许被两个模块同时实现而无人察觉
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **保留 `search: false`，因为"频道内搜索"不算"搜索"**：可以把 `SearchHit` 的语义限定为"跨平台关键词搜索"，而频道内搜索确实不是那个东西。否决理由：**`SOURCES` 里的 `telegram-public` 是按"能回答查询的来源"登记的**，而"在 durov 频道里找 telegram 相关内容"确实是回答查询。把能力藏起来，代价是调用方**永远不知道这条路径存在**而它零成本、零凭证、已实测可用。
 - **支持纯关键词搜索（返回一个需要用户先给频道的错误提示 / 或猜测频道）**：更贴近"搜索"的直觉。否决理由：**Telegram 网页面上不存在全站搜索**（302 / 空壳），猜频道会把"我们没做到"变成"平台给了结果"。如实拒绝并给出正确写法，比伪造一个降级体验诚实。

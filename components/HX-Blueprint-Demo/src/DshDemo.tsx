@@ -9,12 +9,12 @@ import {
 /**
  * 演示页的入口。
  *
- * 它只做一件事: 证明蓝图库能被**外部包**消费 —— 这个包不在 HX-UI 里,
+ * 它只做一件事: 证明蓝图库能被**外部包**消费  这个包不在 HX-UI 里,
  * 通过 peerDependencies 声明依赖, 只用导出的公共 API。
  * 如果这里能跑, 说明拓展点开对了。
  */
 import type { BlueprintGraph } from "@hx/ui";
-import { useBlueprint, useSelection, validateGraph, canConnect, SyncChannel, graphToHash } from "@hx/ui";
+import { useBlueprint, useSelection, validateGraph, canConnect, SyncChannel, graphToHash, graphMatchesRegistry } from "@hx/ui";
 import { createSourceRegistry, NODES } from "./dsh/nodes";
 import { dshAgentLoopGraph, COLLAPSIBLE_GROUPS } from "./dsh/graph";
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, cn } from "@hx/ui";
@@ -31,21 +31,50 @@ export function DshDemo(): JSX.Element {
   /**
    * 与独立页面同步。
    *
-   * 频道名带 source 标识 —— dsh 那张图和 demo 那张图不该互相覆盖。
+   * 频道名带 source 标识  dsh 那张图和 demo 那张图不该互相覆盖。
    * 用 ref 读最新图: onRequest 是构造时注册的, 闭包会读到旧值。
    */
   const graphRef = useRef(api.graph);
   graphRef.current = api.graph;
+  /**
+   * `api` 的身份**每次渲染都变** (useBlueprint 每次都返回新对象), 所以
+   * 它绝不能进下面那个 effect 的依赖  否则每次渲染都拆掉旧 SyncChannel、
+   * 建一个新 BroadcastChannel, 于是:
+   *
+   *   1. 新建通道要发一条 `request` 问状态, 对端回 `graph`;
+   *   2. 对端的 `onRemote` 改图 → 它重渲染 → 它的 effect 重跑 → 又新建通道 → 又 request …
+   *
+   * 实测一次节点拖拽让本页建了 **250 个** BroadcastChannel, 两端互推 214 次
+   * graph 广播, 页面直接卡死。用 ref 取最新的 api, 依赖只留频道名。
+   */
+  const apiRef = useRef(api);
+  apiRef.current = api;
+
   const syncRef = useRef<SyncChannel | null>(null);
   useEffect(() => {
     const sync = new SyncChannel({
-      channel: "hx-blueprint-dsh",
-      onRemote: (g) => api.replace(g),
+      channel: "hx-blueprint-source",
+      onRemote: (g) => apiRef.current.replace(g),
       onRequest: () => graphRef.current,
+      /**
+       * 频道名只是一个名字, 谁都能用同名频道开一个**别的源**的页面。
+       *
+       * 这一页用的是**源码层**注册表 (33 个 `dsh` 节点), 而独立页面那侧在
+       * `#src=dsh` 时用的是**架构层**注册表 (10 个大步骤 + 子图)。两者节点
+       * 类型名不同  无条件接受对方的图, 整张图会立刻变成"未注册"。
+       *
+       * 实测: 独立页一发广播, 这一页就从"校验通过"变成 **70 个错误**
+       * (10 个节点 × 各自的端口 + 边), 因为架构层的类型名源码层注册表
+       * 一个都不认识。
+       *
+       * 与 blueprint-main.tsx 同一条判据: 不认识的图丢弃, 本地图保持不动。
+       */
+      accept: (g) => graphMatchesRegistry(registry, g),
     });
     syncRef.current = sync;
     return () => { sync.close(); syncRef.current = null; };
-  }, [api]);
+    // registry 由 useMemo 建, 身份稳定; 通道只在挂载时建一次
+  }, [registry]);
 
   // 本地改动 -> 广播
   useEffect(() => {
@@ -55,12 +84,23 @@ export function DshDemo(): JSX.Element {
   /**
    * 独立整页画布的 URL。
    *
-   * 每次渲染时算, 把当前图内联进去 —— 那边打开就有内容, 不用等同步。
+   * 每次渲染时算, 把当前图内联进去  那边打开就有内容, 不用等同步。
    * (原来是 window.open, 会被弹窗拦截器拦掉, 用户点了毫无反应。)
    */
   const standaloneHref = () => {
     const enc = graphToHash(api.graph);
-    return "/blueprint.html#src=dsh&channel=hx-blueprint-dsh" + (enc ? `&graph=${enc}` : "");
+    /**
+     * `src` 必须是 `source`, 不能是 `dsh`。
+     *
+     * 这一页用的是**源码层**注册表 (createSourceRegistry, 33 个节点), 而
+     * blueprint.html 的 `readSource()` 在 `src=dsh` 时加载的是**架构层**
+     * 注册表 (10 个大步骤 + 子图)。写错 src 的后果是: 新开的独立页拿到
+     * 一张自己不认识类型的图, 页面上每个节点都会变成"未注册"  而且
+     * 因为 `accept` 拦着, 同步也救不回来, 看起来就是"打开是空的/全错"。
+     *
+     * 频道名同理: 源码层的图不该广播到架构层那个 `hx-blueprint-dsh` 频道上。
+     */
+    return "/blueprint.html#src=source&channel=hx-blueprint-source" + (enc ? `&graph=${enc}` : "");
   };
 
   return (
@@ -112,7 +152,7 @@ export function DshDemo(): JSX.Element {
       />
 
       <div className="text-[11px] leading-relaxed text-muted-foreground">
-        白线是执行流, 彩线是数据。每条边都对应源码里一个真实的"下一步" ——
+        白线是执行流, 彩线是数据。每条边都对应源码里一个真实的"下一步" 
         节点定义上带 <code className="rounded bg-muted/60 px-1">source</code> 字段标了行号, 可以回去核对。
         双击子图节点进入, 面包屑退回。
       </div>
@@ -120,7 +160,9 @@ export function DshDemo(): JSX.Element {
   );
 }
 
-/** 现场演示"加一个节点 = 加一行"。 */
+/** 现场演示"加一个节点 = 加一行"。 
+ * .agents/notes/implemented/process/2026-10-08-repository-agent-notes-v2-adoption.md
+ */
 function HowToExtend({ registry }: { readonly registry: ReturnType<typeof createSourceRegistry> }): JSX.Element {
   const [added, setAdded] = useState(false);
   const [verdict, setVerdict] = useState<string>("");
@@ -141,7 +183,7 @@ function HowToExtend({ registry }: { readonly registry: ReturnType<typeof create
     });
     setAdded(true);
 
-    // 加完立刻验证类型判据对它也生效 —— 不需要任何额外接线
+    // 加完立刻验证类型判据对它也生效  不需要任何额外接线
     const g: BlueprintGraph = {
       nodes: [
         { id: "a", type: "text", x: 0, y: 0, params: { v: "hi" } },
@@ -183,7 +225,7 @@ function HowToExtend({ registry }: { readonly registry: ReturnType<typeof create
           )}
         </div>
         <p className="text-[11px] leading-relaxed text-muted-foreground">
-          就这一段。<strong>蓝图层零改动</strong> —— 校验、类型相容、面板、求值全都对新节点立即生效。
+          就这一段。<strong>蓝图层零改动</strong>  校验、类型相容、面板、求值全都对新节点立即生效。
           加一种数据类型同理: <code className="rounded bg-muted/60 px-1">registry.type(&#123; id: "image", extends: "object" &#125;)</code>,
           之后 image 就能连进 object 的输入口(协变)。
         </p>

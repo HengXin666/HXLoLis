@@ -1,3 +1,4 @@
+import { captureFailure, saveReport } from './report.ts'
 import { lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, relative, resolve } from 'node:path'
@@ -192,6 +193,7 @@ function parseArgs(argv: string[]): Options {
 }
 
 const argv = process.argv.slice(2)
+captureFailure("context-layers", process.cwd())
 if (argv.includes('--self-test')) {
   selfTest()
 } else {
@@ -207,9 +209,10 @@ if (argv.includes('--self-test')) {
       const problems: string[] = []
       checkBudgets(dirs, options, problems)
       checkBaseline(missingEntries(dirs, options), options.baseline, problems)
-      for (const problem of problems) console.error('ERROR ' + problem)
-      if (problems.length) console.error('[check-context-layers] ' + problems.length + ' violation(s) under ' + options.root)
-      else console.log('[check-context-layers] PASS (' + options.root + ')')
+      saveReport('context-layers', problems.map((message) => ({
+        rule: message.includes('bytes (limit') ? 'context-budget' : message.startsWith('baseline entry') ? 'baseline-stale' : 'context-entry-missing',
+        severity: 'error', message,
+      })), options.root)
       process.exitCode = problems.length ? 1 : 0
     }
   }

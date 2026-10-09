@@ -7,7 +7,7 @@ import { githubScope } from "./context.ts";
 import { sealArtifact, verifyArtifact } from "./artifact.ts";
 import { trustedBaseline } from "./baseline.ts";
 import { parseGraph, selectTests } from "../core/affected.ts";
-import { fingerprint, makeReport, parseFindings } from "../core/report.ts";
+import { consoleReport, fingerprint, makeReport, parseFindings } from "../core/report.ts";
 import type { Baseline, Finding, Scope } from "../core/model.ts";
 
 function failure(id: string, message: string): Finding {
@@ -25,10 +25,16 @@ function execute(root: string, task: Task, timeout: number, env: NodeJS.ProcessE
     });
 }
 
-export function runTasks(root: string, tasks: Task[], timeout: number, env: NodeJS.ProcessEnv): Finding[] {
+export function runTasks(root: string, tasks: Task[], timeout: number, env: NodeJS.ProcessEnv,
+    logs = join(root, "scripts/.hx_code_quality/reports/tasks")): Finding[] {
+    mkdirSync(logs, { recursive: true });
     const findings: Finding[] = [];
     for (const task of tasks) {
         const result = execute(root, task, timeout, env);
+        writeFileSync(join(logs, encodeURIComponent(task.id) + ".json"), JSON.stringify({
+            task: task.id, command: task.command, status: result.status, signal: result.signal,
+            error: result.error?.message, stdout: result.stdout, stderr: result.stderr,
+        }, null, 4) + "\n");
         if (result.error || result.signal || result.status === null) {
             findings.push(failure(task.id, String(result.error?.message ?? result.signal ?? "No exit status")));
             continue;
@@ -46,18 +52,16 @@ export function runTasks(root: string, tasks: Task[], timeout: number, env: Node
         } else if (result.status !== 0) {
             findings.push(failure(task.id, "Command exited " + result.status));
         }
-        if (task.format === "exit" && result.stdout) {
-            process.stdout.write(result.stdout);
-        }
-        if (result.stderr) {
-            process.stderr.write(result.stderr);
-        }
     }
     return findings;
 }
 
 function tests(root: string, config: Config, scope: Scope, event: string, env: NodeJS.ProcessEnv): Task[] {
     const impact = execute(root, config.impact, config.timeoutMs, env);
+    writeFileSync(join(root, "scripts/.hx_code_quality/reports/test-impact.json"), JSON.stringify({
+        command: config.impact.command, status: impact.status, signal: impact.signal,
+        error: impact.error?.message, stdout: impact.stdout, stderr: impact.stderr,
+    }, null, 4) + "\n");
     if (impact.error || impact.status !== 0) {
         throw new Error("Impact graph command failed");
     }
@@ -68,22 +72,26 @@ function tests(root: string, config: Config, scope: Scope, event: string, env: N
         throw new Error("Impact graph and test registry have different test IDs");
     }
     const plan = selectTests(scope, graph, event);
-    writeFileSync(join(root, ".hx-quality/reports/test-plan.json"), JSON.stringify(plan, null, 4) + "\n");
+    writeFileSync(join(root, "scripts/.hx_code_quality/reports/test-plan.json"), JSON.stringify(plan, null, 4) + "\n");
     return plan.tests.map((id) => registered.get(id)!);
 }
 
 /**
  * Execute independent checks without dropping failures from later tasks
+ *
+
  * .agents/notes/implemented/process/2026-10-07-agent-code-installation-contract.md
  */
 export function runCI(root: string, group: string): number {
     if (!["code", "docs", "build", "compatibility", "tests"].includes(group)) {
         throw new Error("Unknown CI group: " + group);
     }
-    const reports = join(root, ".hx-quality/reports");
-    const build = join(root, ".hx-quality/build");
+    const reports = join(root, "scripts/.hx_code_quality/reports");
+    const build = join(root, "scripts/.hx_code_quality/build");
     mkdirSync(reports, { recursive: true });
     const findings: Finding[] = [];
+    const logs = join(reports, group + "-tasks");
+    rmSync(logs, { recursive: true, force: true });
     let notApplicable: string | undefined;
     let baseline: Baseline[] = [];
     try {
@@ -93,12 +101,12 @@ export function runCI(root: string, group: string): number {
         const scopePath = join(reports, "scope-" + group + ".json");
         writeFileSync(scopePath, JSON.stringify(scope, null, 4) + "\n");
         const env = { ...process.env, HX_QUALITY_SCOPE: scopePath, HX_QUALITY_BUILD: build };
-        findings.push(...runTasks(root, config.setup, config.timeoutMs, env));
+        findings.push(...runTasks(root, config.setup, config.timeoutMs, env, logs));
         if (findings.some((item) => item.severity === "error")) {
             findings.push(failure(group, "Blocked by dependency setup"));
         } else if (group === "tests") {
             verifyArtifact(build, scope.head);
-            findings.push(...runTasks(root, tests(root, config, scope, event, env), config.timeoutMs, env));
+            findings.push(...runTasks(root, tests(root, config, scope, event, env), config.timeoutMs, env, logs));
         } else {
             const selected = config.groups[group];
             notApplicable = selected.notApplicable;
@@ -106,7 +114,7 @@ export function runCI(root: string, group: string): number {
                 rmSync(build, { recursive: true, force: true });
                 mkdirSync(build, { recursive: true });
             }
-            findings.push(...runTasks(root, selected.tasks, config.timeoutMs, env));
+            findings.push(...runTasks(root, selected.tasks, config.timeoutMs, env, logs));
             if (group === "build" && !findings.some((item) => item.severity === "error")) {
                 sealArtifact(build, scope.head, notApplicable);
             }
@@ -118,5 +126,6 @@ export function runCI(root: string, group: string): number {
     writeFileSync(join(reports, group + ".json"), JSON.stringify({ ...report.json, notApplicable }, null, 4) + "\n");
     writeFileSync(join(reports, group + ".md"), report.markdown
         + (notApplicable ? "\nNot applicable: " + notApplicable.replace(/[\r\n]/g, " ") + "\n" : ""));
+    consoleReport(findings, join(reports, group + ".json"));
     return report.exitCode;
 }

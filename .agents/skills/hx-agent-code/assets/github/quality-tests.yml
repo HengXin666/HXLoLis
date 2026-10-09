@@ -28,7 +28,7 @@ jobs:
               uses: actions/download-artifact@v4
               with:
                   name: ${{ inputs.artifact-name }}
-                  path: .hx-quality/build/
+                  path: scripts/.hx_code_quality/build/
             - name: Run affected push tests or every PR test
               run: node .agents/skills/hx-agent-code/scripts/ci.ts tests
             - name: Upload test plan and all findings
@@ -36,5 +36,5 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                   name: quality-tests-${{ github.run_id }}-${{ github.run_attempt }}
-                  path: .hx-quality/reports/
+                  path: scripts/.hx_code_quality/reports/
                   include-hidden-files: true

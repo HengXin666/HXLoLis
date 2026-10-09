@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/verify-links.ts`（新建）、`scripts/sagasu.ts`（`search --verify`）
+Decision-ID: link-verification
+
+
+## Code
+
+- `components/HX-Sagasu/scripts/sagasu.ts`
+- `components/HX-Sagasu/src/verify-links.ts`
 
 ## Problem
 

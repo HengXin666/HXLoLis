@@ -2,12 +2,17 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/scripts/diag/{minimal-repro.ts,minimal-control.mjs,README.md}`（新建）
+Decision-ID: minimal-repro
+
+
+## Code
+
+- `components/HX-Sagasu/scripts/diag/minimal-repro.ts`
 
 ## Problem
 
 > **本 note 的"目录决定论"结论已被推翻**  见
-> [2026-09-19-conclusion-overturned.md](./2026-09-19-conclusion-overturned.md)。
+> [2026-09-19-conclusion-overturned.md](2026-09-19-conclusion-overturned.md)。
 > 那组"目录 vs 结果"的对照被一次**偶发失败**污染了；重复实验显示
 > `sagasu.ts` 稳定失败（11×5），而所有手工等价脚本稳定正常（0×6）。
 > **保留本 note 是因为二分过程（805→423→194 行）与 29 个排除方向仍然有效。**
@@ -71,6 +76,8 @@ diag/ 下解析成:    file:///…/HX-Sagasu/src/fetchers.ts
 **而那恰好能解释"11 个同时超时"**。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **继续二分那一块**：更彻底。**否决理由**：本轮已 19 次调用，而**二分已经推进到"193 行"这个足够小的规模**  下一步该是**验证"两个模块实例"这个具体假设**（见上第 1 条），而不是继续裁代码。
 - **把 `sagasu.ts` 移到 `diag/` 下"修好"它**：一行 `mv` 就能让失败消失。**否决理由**：**那是把症状搬走而不是解决**。而且`scripts/sagasu.ts` 是文档化过的入口路径（多篇 note 引用它），移动它会破坏那些引用。

@@ -2,8 +2,14 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/argo-source.ts`（`ARGO_ENGINE` 扩张 + `skip_cache`）、`src/recall.ts`（`SOURCES` 登记）、`src/fetchers.ts`（`SOURCE_PLAN`）、`tests/registry-consistency.test.ts`（`IMPL_OWNER`/`DUAL_PATH`）
+Decision-ID: engine-breadth-and-skip-cache
+
 - 上游对照: `research-output/hx-sagasu/2026-09-18-capability-parity.md`
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
+- `components/HX-Sagasu/tests/registry-consistency.test.ts`
 
 ## Problem
 

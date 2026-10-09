@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/argo-gate.ts`（新建）、`src/argo-source.ts`（闸门 + 分档超时）、`src/route-sources.ts`（兜底裁剪）
+Decision-ID: argo-serial-gate
+
+
+## Code
+
+- `components/HX-Sagasu/src/argo-gate.ts`
 
 ## Problem
 
@@ -77,6 +82,8 @@ wikipedia   12035ms | duckduckgo 30057ms | reddit 30050ms
 "**权威层永不跳过**"是一条贯穿全部路由分支的约束，**不是主分支的局部规则**。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **把闸门做成可配置**（环境变量）：更灵活。**否决理由**：**上限由 argo 的实现决定（串行）**，不是我们的运行时偏好。做配置只会多一个"没人会去读"的隐式分支，而当 argo 改成并发处理时这个值**要跟着改**  改在代码里更容易被发现。
 - **只加闸门，不改超时**：改动更小。**否决理由**：**闸门只解决并发，解决不了"两个慢引擎各占 30 秒"**  串行之后那是纯粹的串行浪费。

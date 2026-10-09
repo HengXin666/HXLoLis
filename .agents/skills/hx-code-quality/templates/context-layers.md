@@ -13,7 +13,7 @@
 
 ## 判据
 
-`scripts/check-context-layers.ts` 一次管两个方向, 它是本 skill 自带的脚本, 复制进目标项目即可运行, 无第三方依赖
+`scripts/check-context-layers.ts` 一次管两个方向, 它是本 skill 自带的脚本, 连同 scripts/report.ts 复制进目标项目即可运行, 无第三方依赖
 
 |检查|判据|默认|
 |---|---|---|

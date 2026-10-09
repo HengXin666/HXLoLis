@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/scripts/page.ts`（消费 `source-started` + 排队耗时显示）
+Decision-ID: dead-event-wired
+
+
+## Code
+
+- `components/HX-Sagasu/scripts/page.ts`
 
 ## Problem
 
@@ -39,6 +44,8 @@ timing = (queued > 1000 && queued > detail.elapsedMs)
 两个都在，是因为**它们分别是不同的成本**（自己慢 vs 等别人），不是同一个量的两种写法。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **用 `startedAt` 替换 `elapsedMs`**：更简洁。**否决理由**：**两者是不同的量**  `elapsedMs` 是 recall 内部算的层内耗时，`Date.now() - startedAt` 是墙钟差（含队列）。换掉会丢掉「这一层跑了多久」这个信息。
 - **总是显示排队时间**：信息更全。**否决理由**：**大多数来源不排队**，无条件显示会让每行都挂一个「排队 0ms」，把真正的异常淹没掉。

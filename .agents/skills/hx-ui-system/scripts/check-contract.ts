@@ -5,13 +5,19 @@
  *       前端不得手写通道字符串, 必须 import 契约常量; 响应类型必须带运行时校验.
  * 用法: node scripts/check-contract.ts [项目根]   (默认 .)
  */
+import { captureFailure, saveReport } from "./report.ts";
 import fs from "node:fs";
 import path from "node:path";
 
 const root = process.argv[2] ?? ".";
 const abs = path.resolve(root);
+captureFailure("contract", abs)
 const SKIP = new Set(["node_modules", "dist", "build", ".git", ".next"]);
 
+/**
+ * HXLoLis 接入 Agent Notes v2
+ * .agents/notes/implemented/process/2026-10-08-repository-agent-notes-v2-adoption.md
+ */
 function walk(dir, acc = []) {
   if (!fs.existsSync(dir)) return acc;
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -87,9 +93,8 @@ if (fs.existsSync(apiDir)) {
   }
 }
 
-const fmt = (l) => l.map((e) => `  ✗ ${e.rule}\n      ${e.msg}`).join("\n");
-if (errors.length) console.error("ERROR (" + errors.length + "):\n" + fmt(errors));
-if (warns.length) console.warn("\nWARN (" + warns.length + "):\n" + fmt(warns));
-if (!errors.length && !warns.length) console.log("contract: 通过 (" + abs + ")");
-else console.log("\n合计 " + errors.length + " 错误, " + warns.length + " 警告");
-process.exit(errors.length ? 1 : 0);
+saveReport("contract", [
+  ...errors.map((e) => ({ rule: e.rule, severity: "error", message: e.msg })),
+  ...warns.map((e) => ({ rule: e.rule, severity: "warning", message: e.msg })),
+], abs);
+process.exitCode = errors.length ? 1 : 0;

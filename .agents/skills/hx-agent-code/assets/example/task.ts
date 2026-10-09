@@ -4,6 +4,8 @@ import assert from "node:assert/strict";
 
 /**
  * Keep the runnable example separate from production checker coverage
+ *
+
  * .agents/notes/implemented/process/2026-10-07-agent-code-installation-contract.md
  */
 function exampleMain(): void {

@@ -27,7 +27,7 @@ jobs:
             - uses: actions/upload-artifact@v4
               with:
                   name: quality-build-${{ github.run_id }}-${{ github.run_attempt }}
-                  path: .hx-quality/build/
+                  path: scripts/.hx_code_quality/build/
                   include-hidden-files: true
                   if-no-files-found: error
             - name: Upload build report
@@ -35,7 +35,7 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                   name: quality-build-report-${{ github.run_id }}-${{ github.run_attempt }}
-                  path: .hx-quality/reports/
+                  path: scripts/.hx_code_quality/reports/
                   include-hidden-files: true
     compatibility:
         if: github.event.deleted != true
@@ -61,7 +61,7 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                   name: quality-compatibility-${{ github.run_id }}-${{ github.run_attempt }}
-                  path: .hx-quality/reports/
+                  path: scripts/.hx_code_quality/reports/
                   include-hidden-files: true
     tests:
         needs: build

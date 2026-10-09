@@ -5,11 +5,13 @@
  * 用法: node scripts/check-ui-rules.ts [扫描目录...]   (默认 src)
  * 退出码: 0 通过, 1 有 ERROR, 2 用法错误
  */
+import { captureFailure, saveReport } from "./report.ts";
 import fs from "node:fs";
 import path from "node:path";
 
 const roots = process.argv.slice(2);
 if (roots.length === 0) roots.push("src");
+captureFailure("ui-rules", process.cwd())
 
 const SOURCE_EXT = new Set([".ts", ".tsx", ".js", ".jsx", ".css"]);
 const SKIP_DIRS = new Set(["node_modules", "dist", "build", ".git", ".next", "coverage"]);
@@ -132,18 +134,8 @@ for (const root of roots) {
   }
 }
 
-// ── 输出 ──
-const fmt = (list) => list.map((e) => `  ${e.level === "E" ? "✗" : "!"} ${e.rule}  ${e.file}:${e.line}\n      ${e.msg}`).join("\n");
-
-if (errors.length) {
-  console.error("ERROR (" + errors.length + "):\n" + fmt(errors));
-}
-if (warns.length) {
-  console.warn("\nWARN (" + warns.length + "):\n" + fmt(warns));
-}
-if (!errors.length && !warns.length) {
-  console.log("ui-rules: 通过 (" + roots.join(", ") + ")");
-} else {
-  console.log("\n合计 " + errors.length + " 错误, " + warns.length + " 警告");
-}
-process.exit(errors.length ? 1 : 0);
+saveReport("ui-rules", [
+  ...errors.map((e) => ({ rule: e.rule, severity: "error", message: e.msg, path: e.file, line: e.line })),
+  ...warns.map((e) => ({ rule: e.rule, severity: "warning", message: e.msg, path: e.file, line: e.line })),
+]);
+process.exitCode = errors.length ? 1 : 0;

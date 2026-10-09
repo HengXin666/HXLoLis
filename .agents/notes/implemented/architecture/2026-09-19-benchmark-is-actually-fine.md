@@ -2,8 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/route-sources.ts`（新增 `genai` 话题族，保留）
+Decision-ID: benchmark-is-actually-fine
+
 - **更正**: 上一轮 `2026-09-19-genai-topic-and-failed-fixes.md` 里「benchmark 仍未达标」的判断**是错的**，本 note 就地取代它
+
+## Code
+
+- `components/HX-Sagasu/src/route-sources.ts`
 
 ## Problem
 

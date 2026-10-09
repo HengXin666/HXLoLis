@@ -55,3 +55,5 @@ node scripts/check-ui-rules.ts /tmp/clean/src; echo "退出码: $?"     # 必须
 ## 过关条件
 
 两条脚本各跑过一次, 且**都亲眼见到过退出码 1 与 0**
+
+复制两个检查器时一并复制 scripts/report.ts, 诊断默认落在 . gate-reports/, 可用 HX_GATE_REPORT 指定路径. 超过 10 项时终端仅显示数量, 类型和报告路径

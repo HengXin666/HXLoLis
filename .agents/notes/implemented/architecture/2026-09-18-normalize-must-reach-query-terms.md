@@ -2,8 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/recall.ts`（`queryTerms` 前置归一）
+Decision-ID: normalize-must-reach-query-terms
+
 - 相关: `src/normalize.ts`（实现未变，其归一结果**此前从未进过检索词**）
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
 
 ## Problem
 
@@ -48,6 +53,8 @@ Status: implemented
 3. **抽词**（词流 + CJK bigram）: bigram 保证"2 字查询与未登录词可召回"
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **把 `normalize` 的 `variants` 也并进检索词**（"两种写法并列搜"）：文件头正是这么写的（"检索时应当**并列搜索**的写法"）。否决理由：**那会把容错变成"两种写法都算命中"**  一条**只含错字的旧文**（"微薄的实时热搜榜"）就成了相关证据，判据失真。**容错的正确形态是用归一后的词去检索，而不是把错字也当有效词。** 已加测试显式锁住这条。
 - **在 `recall` 里对归一前后各搜一次**：最彻底，能同时命中错字文档与正确文档。否决理由：**查询次数翻倍**（26 个来源 × 2），而收益仅覆盖"文档标题也打错字"这一个场景。当前取舍（归一后搜一次）在**两种场景下都不丢证据**（见下），只是错字文档的排序靠后。**用 2 倍请求换一个排序改善，不划算。**

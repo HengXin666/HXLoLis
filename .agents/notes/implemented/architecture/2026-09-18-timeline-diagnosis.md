@@ -2,8 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/scripts/sagasu.ts`（`--explain` 时间线的排障用法）
+Decision-ID: timeline-diagnosis
+
 - 起点: 上轮结论"下一轮第一件事是用 `--explain` 逐行对比两条路径"
+
+## Code
+
+- `components/HX-Sagasu/scripts/sagasu.ts`
 
 ## Problem
 
@@ -66,6 +71,8 @@ reddit       进入 +0  落定 +21165 FAIL   ← 它本就没后端
 而它们的代码与受控实验**实质相同**。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **继续分解 `literal.mjs`**（逐块替换成受控版）：本轮已做 4 次分解（`v3`/`v4`/`v5`/`v6`），**每次都得到"正常"的结果**。**否决理由**：**当受控复现总是成功、而目标文件总是失败时，继续在"代码差异"上找原因是低期望的**  差异可能根本不在代码里（进程启动环境、模块加载顺序、argo 侧的状态）。
 - **把 `literal.mjs` 当成"不可复现"而不记录**：省事。**否决理由**：它**稳定复现 3/3 次**（21.6s / 25.4s / 19.4s，恒为 10 失败）。**稳定复现的东西不该被当作噪声。**

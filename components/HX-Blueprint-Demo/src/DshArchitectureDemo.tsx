@@ -8,12 +8,12 @@ import {
 import { buildRootGraph, SUBGRAPHS } from "./dsh/build";
 
 /**
- * dsh agent loop —— 架构层视图。
+ * dsh agent loop  架构层视图。
  *
  * 根图 = 10 个大步骤; 每个大步骤是一个**子图**, 双击进入看它"怎么做"。
  *
  * 与旧版的区别: 旧版 60 个节点对应源码的每个分支 (那是代码流程图),
- * 这一版只到"怎么做"这一层 —— 照着它能 1:1 复现核心功能, 但不必抄分支。
+ * 这一版只到"怎么做"这一层  照着它能 1:1 复现核心功能, 但不必抄分支。
  */
 
 const STAGE_KEYS = Object.keys(SUBGRAPHS);
@@ -88,7 +88,7 @@ export function DshArchitectureDemo(): JSX.Element {
   );
 }
 
-/** 这张图用了蓝图库的哪些能力 —— 可折叠的说明。 */
+/** 这张图用了蓝图库的哪些能力  可折叠的说明。 */
 function UsedFeatures(): JSX.Element {
   const [open, setOpen] = useState(false);
   const items: Array<[string, string]> = [

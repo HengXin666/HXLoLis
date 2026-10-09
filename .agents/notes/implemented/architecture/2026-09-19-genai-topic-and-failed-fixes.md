@@ -2,12 +2,17 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/route-sources.ts`（新增 `genai` 话题族）、`src/recall.ts`（记录失败的修法）
+Decision-ID: genai-topic-and-failed-fixes
+
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
 
 ## Problem
 
 > **本 note 的「benchmark 仍未达标」结论已被更正**  见
-> [2026-09-19-benchmark-is-actually-fine.md](./2026-09-19-benchmark-is-actually-fine.md)。
+> [2026-09-19-benchmark-is-actually-fine.md](2026-09-19-benchmark-is-actually-fine.md)。
 > 排序**本来就是对的**: 分档实测显示前 5 条全是 `5 词 strong github`;
 > 我看到「第 4 位是 crossref」是因为 **CLI 默认 `perSourceLimit=3`**，
 > **不是排序失效**。

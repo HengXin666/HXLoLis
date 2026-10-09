@@ -2,7 +2,14 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/verify-claims.ts`（新建）、`scripts/sagasu.ts`（`claims` 子命令）、`tests/verify-claims.test.ts`（新建）
+Decision-ID: claim-verification
+
+
+## Code
+
+- `components/HX-Sagasu/scripts/sagasu.ts`
+- `components/HX-Sagasu/src/verify-claims.ts`
+- `components/HX-Sagasu/tests/verify-claims.test.ts`
 
 ## Problem
 

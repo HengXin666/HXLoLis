@@ -98,7 +98,7 @@ export function AgentApiDemo(): JSX.Element {
         </div>
 
         <div className="text-[11px] leading-relaxed text-muted-foreground">
-          <strong>重叠必须为 0。</strong>叠在一起的图对人类等于没有 ——
+          <strong>重叠必须为 0。</strong>叠在一起的图对人类等于没有 
           所以布局不是"能跑就行", 而是带自检: 有重叠就加大间距重排, 最多重试三次。
         </div>
       </div>

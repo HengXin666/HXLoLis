@@ -2,7 +2,12 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/resolve.ts`（记录 `extractTopic` 的已知缺陷与否决记录，**行为未变**）
+Decision-ID: e2e-acceptance
+
+
+## Code
+
+- `components/HX-Sagasu/src/resolve.ts`
 
 ## Problem
 

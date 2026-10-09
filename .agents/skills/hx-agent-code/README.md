@@ -18,10 +18,10 @@ node --test .agents/skills/hx-agent-code/scripts/tests/*.test.ts
 uv run .agents/skills/hx-make-skill/scripts/validate_skill.py .agents/skills/hx-agent-code
 uv run .agents/skills/hx-make-skill/scripts/prose_rules.py --check .agents/skills/hx-agent-code
 uv run .agents/skills/hx-make-skill/scripts/check_layout.py .agents/skills/hx-agent-code
-node .agents/skills/hx-agent-notes/scripts/cli/verify-all.ts
+uv run scripts/redlines/agent_notes.py --diff
 ```
 
-用户明确要求把维护说明放在 README, 因此采用此布局, 不按 hx-make-skill 的默认惯例删除 README 或把维护索引搬回常驻正文. 规范校验预期有两项惯例 Warning: 根 README, scripts/tests 未在 SKILL 正文索引. 测试索引由本文维护, 其他 Warning 和所有 Error 仍须排查. 不使用会将这两项惯例升级为 Error 的 strict 模式
+用户明确要求把维护说明放在 README, 因此采用此布局, 不按 hx-make-skill 的默认惯例删除 README 或把维护索引搬回常驻正文. 规范校验预期只有根 README 一项惯例 Warning, 其他 Warning 和所有 Error 仍须排查. 不使用会将该惯例升级为 Error 的 strict 模式
 
 另用项目已安装的 TypeScript 执行 strict/noEmit 类型检查, 显式启用 allowImportingTsExtensions 与 nodenext; 不为维护验证静默引入第三方库. 复杂代码或流程改动按 hx-make-skill 执行 fresh agent 实际任务验证, 不向它提供预期答案
 
@@ -31,11 +31,7 @@ node .agents/skills/hx-agent-notes/scripts/cli/verify-all.ts
 
 ## 测试索引
 
-- `scripts/tests/scope.test.ts`: 修改 Git 范围算法后运行, 覆盖初始仓库/暂存/改名/删除
-- `scripts/tests/affected.test.ts`: 修改影响选择算法后运行, 覆盖契约/依赖/未知/PR
-- `scripts/tests/report.test.ts`: 修改报告或覆盖审计后运行, 覆盖基线/等级/缺项/CLI
-- `scripts/tests/ci.test.ts`: 修改工作流或 runner 后运行, 在临时仓库验证分组、事件、失败汇总、产物和基线
-- `scripts/tests/ci-fixture.ts`: CI 测试的隔离仓库准备与清理, 由 ci.test.ts 调用
+- `scripts/tests/index.md`: 每个维护测试的覆盖范围及运行命令
 
 ## 实物清单与边界
 

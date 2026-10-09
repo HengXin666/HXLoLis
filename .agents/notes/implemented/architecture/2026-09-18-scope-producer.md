@@ -2,7 +2,13 @@
 
 Status: implemented
 
-- 影响: `components/HX-Sagasu/src/scope-resolve.ts`（新建）、`src/adapters/scope-probes.ts`（新建）、`src/recall.ts`（自动识别 + `ctxWithScope`）
+Decision-ID: scope-producer
+
+
+## Code
+
+- `components/HX-Sagasu/src/recall.ts`
+- `components/HX-Sagasu/src/adapters/scope-probes.ts`
 
 ## Problem
 
@@ -57,6 +63,8 @@ Telegram 的频道名规则是平台约束（5-32 字符、只含字母数字下
 > 且有测试锁住两侧对同一批输入的一致结论。
 
 ## Alternatives considered
+
+**什么都不做 / 复用现有。** 最强理由是无需新增实现和维护成本. 现有状态仍存在 Problem 中的具体缺口, 因此采用本记录的选择
 
 - **给 `ThreadAdapter` 加 `probeScope()` 方法**：契约最干净，且**规则只写一遍**。**否决理由**：那是**契约变更**  要动 `adapter.ts` 的接口与**每一个适配器实现**，而当前只有一个适配器需要它。**为一个使用点改公共契约不划算。** 若将来有第二、第三个需要作用域的适配器，就该改契约了  这条记在这里，作为将来切换的信号。
 - **在 `recall` 里硬编码"什么算频道名"**：省掉注册机制。**否决理由**：`recall` 是**分层调度层**，让它知道 Telegram 的频道名格式是**层次穿透**  而适配器端口存在的全部意义就是"平台的所有丑陋都止于此层"（`adapter.ts` 文件头）。

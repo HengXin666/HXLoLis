@@ -2,7 +2,7 @@
 
 先读 references/rules.md 和 references/runtime.md 的完整判据, 把每个项目 checker 注册为稳定 ID. 脚本禁止 js/mjs/cjs, 通用调度用 TS, Python 原生 AST 适配器可用 py 并统一 uv 执行. 脚本目录不超过 6 文件, 文件不超过 300 行, 不通过压缩代码规避
 
-Python 复用 Ruff + 已有类型工具, TS 复用项目的 Prettier/Biome/ESLint + tsc. 未有工具时按依赖顺序提出选型, 未获新库授权不静默安装. 格式配置使用文章阈值, 不以工具默认覆盖
+Python 复用 Ruff + 已有类型工具, TS 复用项目的 Prettier/Biome/ESLint + tsc. 未有工具时按 steps/1-discover/impl/proposals.md 产出候选比较与推荐, 已授权的选型直接实施. 格式配置使用 references/rules.md 阈值, 不以工具默认覆盖
 
 导入/参数/函数范围用语言 AST 或编译器 API, 不用正则匹配源码判断结构. 解析 alias, package exports 和 index/__init__ 公共边界, 计算循环时定位完整路径. 动态导入无法静态解析就标出未知边及需 review 证据, 影响测试选择必须保守全量
 

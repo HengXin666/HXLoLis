@@ -1,4 +1,5 @@
 import { runCI } from "./ci/run.ts";
+import { saveToolError } from "./core/report.ts";
 
 try {
     if (process.argv.length !== 3) {
@@ -6,6 +7,6 @@ try {
     }
     process.exitCode = runCI(process.cwd(), process.argv[2]);
 } catch (error) {
-    process.stderr.write((error instanceof Error ? error.message : String(error)) + "\n");
+    saveToolError(error, "scripts/.hx_code_quality/reports/ci-error");
     process.exitCode = 2;
 }

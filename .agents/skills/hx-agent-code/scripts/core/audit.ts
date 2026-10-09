@@ -4,6 +4,10 @@ import type { Finding, Severity } from "./model.ts";
 
 export function parseCatalog(markdown: string): Map<string, Severity> {
     const entries = [...markdown.matchAll(/^\| (HC-[A-Z-]+) \| (Error|Warning) \|/gm)];
+    const rows = markdown.match(/^\s*\|[^|\n]*HC-/gm) ?? [];
+    if (rows.length !== entries.length) {
+        throw new Error("Malformed catalog rows: " + rows.length + " rows, " + entries.length + " parsed");
+    }
     const rules = new Map<string, Severity>();
     for (const entry of entries) {
         if (rules.has(entry[1])) {
@@ -35,7 +39,7 @@ export function auditCoverage(value: unknown, catalog: Map<string, Severity>): F
             fail(id, "Duplicate rule ID");
         }
         seen.add(id);
-        if (!catalog.has(id) && !/^PROJECT-[A-Z0-9-]+$/.test(id)) {
+        if (!catalog.has(id) && !/^PROJECT-[A-Z0-9]+(?:-[A-Z0-9]+)*$/.test(id)) {
             fail(id, "Unknown rule ID");
         }
         if (row.status === "not-applicable") {
