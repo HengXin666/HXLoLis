@@ -68,6 +68,11 @@ export function parseChanges(raw: string): Change[] {
     return changes;
 }
 
+/** Write the empty tree only when it becomes a diff endpoint, so read only checkouts still work */
+function emptyTree(root: string): string {
+    return git(root, ["hash-object", "-w", "-t", "tree", "--stdin"], "").trim();
+}
+
 /**
  * Preserve all snapshot inputs before project adapters read file contents
  *
@@ -75,7 +80,6 @@ export function parseChanges(raw: string): Change[] {
  */
 export function collectScope(root: string, mode: string, base?: string, head?: string): Scope {
     root = gitLine(root, "rev-parse", "--show-toplevel");
-    const empty = git(root, ["hash-object", "-w", "-t", "tree", "--stdin"], "").trim();
     if (!["worktree", "staged", "range"].includes(mode)) {
         throw new Error("Unknown scope mode: " + mode);
     }
@@ -84,7 +88,7 @@ export function collectScope(root: string, mode: string, base?: string, head?: s
         if (!base || !head) {
             throw new Error("range requires base and head; use base EMPTY for an initial push");
         }
-        baseTree = base === EMPTY_BASE ? empty : resolveTree(root, base);
+        baseTree = base === EMPTY_BASE ? emptyTree(root) : resolveTree(root, base);
     } else {
         if (base || head) {
             throw new Error("Only range accepts explicit endpoints");
@@ -97,7 +101,7 @@ export function collectScope(root: string, mode: string, base?: string, head?: s
             if (refs) {
                 throw new Error("HEAD exists but cannot be read");
             }
-            baseTree = empty;
+            baseTree = emptyTree(root);
         }
     }
     const prefix = ["diff", "--no-ext-diff", "--no-textconv", "--name-status", "-z", "--find-renames"];
