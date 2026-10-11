@@ -66,6 +66,19 @@ test("staged scope stays separate and worktree preserves canceled staged changes
     });
 });
 
+test("worktree keeps a staged rename target after the target is deleted", () => {
+    withRepository(({ root, git }) => {
+        writeFileSync(join(root, "old.ts"), "export const value = 1;\n");
+        git("add", ".");
+        git("commit", "-qm", "base");
+        git("mv", "old.ts", "new.ts");
+        rmSync(join(root, "new.ts"));
+        const paths = collectScope(root, "worktree").changes.flatMap((entry) => [entry.path, entry.oldPath]);
+        assert(paths.includes("new.ts"));
+        assert(paths.includes("old.ts"));
+    });
+});
+
 test("explicit multi-commit range retains renames and deletes", () => {
     withRepository(({ root, git }) => {
         writeFileSync(join(root, "old name.ts"), "export const value = 1;\n");
