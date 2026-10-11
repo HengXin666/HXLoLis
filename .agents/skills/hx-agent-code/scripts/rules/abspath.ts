@@ -7,7 +7,7 @@ import type { Token } from "./tokens.ts";
 
 const SEPARATORS = /^[\/\\]+$/;
 const DRIVE_ROOT = /^[A-Za-z]:[\/\\]?$/;
-const UNAMBIGUOUS = /^(?:[A-Za-z]:[\/\\]|\\\\[^\\]|~[\/\\]|~$)/;
+const UNAMBIGUOUS = /^(?:[A-Za-z]:[\/\\]|\\\\[^\\]|\/\/[^\/]+\/[^\/]|~[\/\\])/;
 const ROOTED = /^[\/\\~]|^[A-Za-z]:(?:[\/\\]|$)/;
 
 /** Drive, UNC and home paths are never routes or patterns, so they count in any value position */
@@ -30,8 +30,9 @@ function violation(item: Token): string | undefined {
     if (item.kind === "string" && absolute) {
         return "Absolute path literal " + JSON.stringify(item.value);
     }
-    if (item.kind === "call" && isRootArgument(item.args?.[0])) {
-        return "Path call " + item.value + " starts from the filesystem root " + JSON.stringify(item.args?.[0]);
+    const first = item.args?.[0];
+    if (item.kind === "call" && typeof first === "string" && (isRootArgument(first) || isAbsoluteValue(first))) {
+        return "Path call " + item.value + " starts from the absolute path " + JSON.stringify(first);
     }
     return undefined;
 }
