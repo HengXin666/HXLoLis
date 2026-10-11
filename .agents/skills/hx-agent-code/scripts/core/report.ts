@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
+import { DETAIL_LIMIT, ERROR, TOOL_ERROR_RULE, WARNING } from "./constants.ts";
 import { list, record, string } from "./model.ts";
 import type { Baseline, Finding } from "./model.ts";
 
@@ -8,10 +9,14 @@ export function fingerprint(ruleId: string, path: string, symbol: string, violat
     return createHash("sha256").update(JSON.stringify([ruleId, path, symbol, violation])).digest("hex");
 }
 
+export function isSeverity(value: unknown): value is Finding["severity"] {
+    return value === WARNING || value === ERROR;
+}
+
 export function parseFindings(value: unknown): Finding[] {
     return list(value).map((raw) => {
         const item = record(raw);
-        if (item.severity !== "warning" && item.severity !== "error") {
+        if (!isSeverity(item.severity)) {
             throw new Error("Unknown severity");
         }
         if (!Number.isInteger(item.line) || Number(item.line) < 1) {
@@ -51,19 +56,26 @@ function escape(value: string): string {
  */
 export function consoleReport(findings: Finding[], output: string): void {
     const types: Record<string, number> = Object.create(null);
-    for (const item of findings) types[item.ruleId] = (types[item.ruleId] ?? 0) + 1;
-    if (findings.length <= 10) {
-        for (const item of findings) console.log(`${item.severity} [${item.ruleId}] ${item.path}:${item.line} ${item.message}`);
+    for (const item of findings) {
+        types[item.ruleId] = (types[item.ruleId] ?? 0) + 1;
+    }
+    if (findings.length <= DETAIL_LIMIT) {
+        for (const item of findings) {
+            console.log(`${item.severity} [${item.ruleId}] ${item.path}:${item.line} ${item.message}`);
+        }
     }
     console.log(`Quality: ${findings.length} 项问题`);
-    if (findings.length) console.log("类型: " + Object.keys(types).sort().map((rule) => `${rule}=${types[rule]}`).join(", "));
+    if (findings.length) {
+        const summary = Object.keys(types).sort().map((rule) => `${rule}=${types[rule]}`);
+        console.log("类型: " + summary.join(", "));
+    }
     console.log("完整报告: " + output);
 }
 
 export function saveToolError(error: unknown, output: string): void {
     const message = error instanceof Error ? error.message : String(error);
-    const finding: Finding = { ruleId: "tool-error", severity: "error", path: "", line: 1,
-        message, evidence: "CLI", fingerprint: fingerprint("tool-error", "", "CLI", message) };
+    const finding: Finding = { ruleId: TOOL_ERROR_RULE, severity: ERROR, path: "", line: 1,
+        message, evidence: "CLI", fingerprint: fingerprint(TOOL_ERROR_RULE, "", "CLI", message) };
     const report = makeReport([finding], []);
     try {
         mkdirSync(dirname(resolve(output)), { recursive: true });
@@ -89,8 +101,8 @@ export function makeReport(findings: Finding[], baseline: Baseline[]) {
         return left < right ? -1 : left > right ? 1 : 0;
     });
     const results = ordered.map((item) => ({ ...item, origin: approved.has(identity(item)) ? "historical" : "new" }));
-    const errors = results.filter((item) => item.severity === "error" && item.origin === "new").length;
-    const warnings = results.filter((item) => item.severity === "warning").length;
+    const errors = results.filter((item) => item.severity === ERROR && item.origin === "new").length;
+    const warnings = results.filter((item) => item.severity === WARNING).length;
     const historical = results.filter((item) => item.origin === "historical").length;
     const json = { version: 1, errors, warnings, historical, findings: results };
     const rows = results.map((item) => {
