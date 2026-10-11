@@ -1,5 +1,6 @@
+import { ERROR, META_RULE } from "./constants.ts";
 import { list, record, string, strings } from "./model.ts";
-import { fingerprint } from "./report.ts";
+import { fingerprint, isSeverity } from "./report.ts";
 import type { Finding, Severity } from "./model.ts";
 
 export function parseCatalog(markdown: string): Map<string, Severity> {
@@ -21,20 +22,27 @@ export function parseCatalog(markdown: string): Map<string, Severity> {
     return rules;
 }
 
-export function auditCoverage(value: unknown, catalog: Map<string, Severity>): Finding[] {
+export function auditCoverage(value: unknown, catalog: Map<string, Severity>, manifest = "coverage.json"): Finding[] {
     const rows = list(value);
     const seen = new Set<string>();
     const findings: Finding[] = [];
     function fail(id: string, message: string): void {
         findings.push({
-            ruleId: "HC-META", severity: "error", path: "coverage.json", line: 1,
+            ruleId: META_RULE, severity: ERROR, path: manifest, line: 1,
             message: id + ": " + message, evidence: "Installation coverage audit",
-            fingerprint: fingerprint("HC-META", "coverage.json", id, message),
+            fingerprint: fingerprint(META_RULE, manifest, id, message),
         });
     }
-    for (const raw of rows) {
-        const row = record(raw);
-        const id = string(row.id);
+    for (const [index, raw] of rows.entries()) {
+        let row: Record<string, unknown>;
+        let id: string;
+        try {
+            row = record(raw);
+            id = string(row.id);
+        } catch {
+            fail("row " + (index + 1), "Coverage row needs an object with a rule ID");
+            continue;
+        }
         if (seen.has(id)) {
             fail(id, "Duplicate rule ID");
         }
@@ -51,7 +59,7 @@ export function auditCoverage(value: unknown, catalog: Map<string, Severity>): F
             }
         } else if (row.status === "implemented") {
             try {
-                if (row.severity !== "warning" && row.severity !== "error") {
+                if (!isSeverity(row.severity)) {
                     throw new Error("Missing severity");
                 }
                 if (catalog.has(id) && catalog.get(id) !== row.severity) {

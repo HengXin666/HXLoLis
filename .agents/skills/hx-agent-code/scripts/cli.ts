@@ -1,14 +1,20 @@
-import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { readFileSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { collectScope } from "./core/scope.ts";
+import { REPORTS_DIR, UTF8 } from "./core/constants.ts";
+import { collectScope, repositoryRoot } from "./core/scope.ts";
 import { parseScope } from "./core/model.ts";
+import type { Finding } from "./core/model.ts";
 import { parseGraph, selectTests } from "./core/affected.ts";
 import { consoleReport, makeReport, parseBaseline, parseFindings, saveToolError } from "./core/report.ts";
 import { auditCoverage, parseCatalog } from "./core/audit.ts";
+import { checkLiterals } from "./rules/literal.ts";
+import { checkAbsolutePaths } from "./rules/abspath.ts";
+
+const USAGE = "Usage: cli.ts scope|affected|report|audit|literals|abspath --key value; see references/runtime.md";
 
 function read(path: string): unknown {
-    return JSON.parse(readFileSync(path, "utf8"));
+    return JSON.parse(readFileSync(path, UTF8));
 }
 
 function write(path: string, value: unknown): void {
@@ -37,49 +43,67 @@ function options(args: string[], allowed: string[], required: string[]): Record<
     return result;
 }
 
+function report(findings: Finding[], out: string, baseline?: string): number {
+    const result = makeReport(findings, baseline ? parseBaseline(read(baseline)) : []);
+    write(out + ".json", result.json);
+    write(out + ".md", result.markdown);
+    consoleReport(findings, resolve(out + ".json"));
+    return result.exitCode;
+}
+
+function findings(command: string, rest: string[]): number {
+    if (command === "report") {
+        const flags = options(rest, ["input", "baseline", "out"], ["input", "out"]);
+        return report(parseFindings(read(flags.input)), flags.out, flags.baseline);
+    }
+    if (command === "audit") {
+        const flags = options(rest, ["manifest", "out"], ["manifest", "out"]);
+        const catalog = parseCatalog(readFileSync(new URL("../references/rules.md", import.meta.url), UTF8));
+        return report(auditCoverage(read(flags.manifest), catalog, flags.manifest), flags.out);
+    }
+    const flags = options(rest, ["tokens", "config", "baseline", "out"], ["tokens", "out"]);
+    const config = flags.config ? read(flags.config) : {};
+    const found = command === "literals" ? checkLiterals(read(flags.tokens), config)
+        : checkAbsolutePaths(read(flags.tokens), config);
+    return report(found, flags.out, flags.baseline);
+}
+
 /**
  * Keep portable analysis separate from project-specific installation
  *
-
  * .agents/notes/implemented/process/2026-10-07-agent-code-installation-contract.md
  */
 export function main(args: string[]): number {
     const [command, ...rest] = args;
     if (command === "scope") {
         const flags = options(rest, ["root", "mode", "base", "head", "out"], ["root", "mode", "out"]);
-        write(flags.out, collectScope(flags.root, flags.mode, flags.base, flags.head));
+        write(flags.out + ".json", collectScope(flags.root, flags.mode, flags.base, flags.head));
         return 0;
     }
     if (command === "affected") {
         const flags = options(rest, ["scope", "graph", "event", "out"], ["scope", "graph", "event", "out"]);
-        write(flags.out, selectTests(parseScope(read(flags.scope)), parseGraph(read(flags.graph)), flags.event));
+        const plan = selectTests(parseScope(read(flags.scope)), parseGraph(read(flags.graph)), flags.event);
+        write(flags.out + ".json", plan);
         return 0;
     }
-    if (command === "report" || command === "audit") {
-        const allowed = command === "report" ? ["input", "baseline", "out"] : ["manifest", "out"];
-        const required = command === "report" ? ["input", "out"] : ["manifest", "out"];
-        const flags = options(rest, allowed, required);
-        const catalogPath = new URL("../references/rules.md", import.meta.url);
-        const findings = command === "report" ? parseFindings(read(flags.input))
-            : auditCoverage(read(flags.manifest), parseCatalog(readFileSync(catalogPath, "utf8")));
-        const baseline = flags.baseline ? parseBaseline(read(flags.baseline)) : [];
-        const report = makeReport(findings, baseline);
-        write(flags.out + ".json", report.json);
-        write(flags.out + ".md", report.markdown);
-        consoleReport(findings, resolve(flags.out + ".json"));
-        return report.exitCode;
+    if (["report", "audit", "literals", "abspath"].includes(command)) {
+        return findings(command, rest);
     }
-    throw new Error("Usage: cli.ts scope|affected|report|audit --key value; see references/runtime.md");
+    throw new Error(USAGE);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+    const args = process.argv.slice(2);
     try {
-        process.exitCode = main(process.argv.slice(2));
+        process.exitCode = main(args);
     } catch (error) {
-        const index = process.argv.indexOf("--out");
-        const requested = index >= 0 ? process.argv[index + 1] : undefined;
-        saveToolError(error, requested && !requested.startsWith("--")
-            ? requested : "scripts/.hx_code_quality/reports/cli-error");
+        const value = args[args.indexOf("--out") + 1];
+        const requested = args.includes("--out") && value && !value.startsWith("--") ? value : undefined;
+        const out = requested ?? join(repositoryRoot(process.cwd()), REPORTS_DIR, "cli-error");
+        for (const suffix of [".json", ".md"]) {
+            rmSync(out + suffix, { force: true });
+        }
+        saveToolError(error, out);
         process.exitCode = 2;
     }
 }

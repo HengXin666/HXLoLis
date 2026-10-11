@@ -10,3 +10,15 @@
 [submodule "components/HX-UI"]
 	path = components/HX-UI
 	url = https://github.com/HengXin666/HX-UI.git
+[submodule "HXLoLi"]
+	path = HXLoLi
+	url = https://github.com/HengXin666/HXLoLi.git
+[submodule "HXLoLi-ANiMe"]
+	path = HXLoLi-ANiMe
+	url = https://github.com/HengXin666/HXLoLi-ANiMe.git
+[submodule "HXLoLi-Music"]
+	path = HXLoLi-Music
+	url = https://github.com/HengXin666/HXLoLi-Music.git
+[submodule "HXLoLi-imouto"]
+	path = HXLoLi-imouto
+	url = https://github.com/HengXin666/HXLoLi-imouto.git

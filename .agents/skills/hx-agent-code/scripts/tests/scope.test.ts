@@ -13,14 +13,13 @@ function repository() {
     git("config", "user.email", "fixture@example.invalid");
     git("config", "user.name", "Quality fixture");
     git("config", "commit.gpgsign", "false");
-    git("config", "core.hooksPath", "/dev/null");
+    git("config", "core.hooksPath", ".git/hc-no-hooks");
     return { root, git };
 }
 
 /**
  * Exercise Git snapshots in independent temporary repositories
  *
-
  * .agents/notes/implemented/process/2026-10-07-agent-code-installation-contract.md
  */
 function withRepository(run: (repo: ReturnType<typeof repository>) => void): void {
@@ -59,6 +58,24 @@ test("staged scope stays separate and worktree preserves canceled staged changes
         writeFileSync(join(root, "only-worktree.ts"), "new");
         assert.deepEqual(collectScope(root, "staged").changes, [{ status: "M", path: "a.ts" }]);
         assert(collectScope(root, "worktree").changes.some((entry) => entry.path === "a.ts"));
+        writeFileSync(join(root, "staged-new.ts"), "first");
+        git("add", "staged-new.ts");
+        writeFileSync(join(root, "staged-new.ts"), "second");
+        const entries = collectScope(root, "worktree").changes.filter((entry) => entry.path === "staged-new.ts");
+        assert.deepEqual(entries, [{ status: "A", path: "staged-new.ts" }]);
+    });
+});
+
+test("worktree keeps a staged rename target after the target is deleted", () => {
+    withRepository(({ root, git }) => {
+        writeFileSync(join(root, "old.ts"), "export const value = 1;\n");
+        git("add", ".");
+        git("commit", "-qm", "base");
+        git("mv", "old.ts", "new.ts");
+        rmSync(join(root, "new.ts"));
+        const paths = collectScope(root, "worktree").changes.flatMap((entry) => [entry.path, entry.oldPath]);
+        assert(paths.includes("new.ts"));
+        assert(paths.includes("old.ts"));
     });
 });
 

@@ -1,3 +1,4 @@
+import { CHECK_GROUPS, REQUIRED_GROUPS } from "../core/constants.ts";
 import { list, record, string, strings } from "../core/model.ts";
 
 export type Task = { id: string; command: string[]; format: "findings" | "exit" };
@@ -22,21 +23,22 @@ function task(value: unknown): Task {
 export function parseConfig(value: unknown): Config {
     const data = record(value);
     const groups: Record<string, Group> = Object.create(null);
-    for (const id of ["code", "docs", "build", "compatibility"]) {
+    for (const id of CHECK_GROUPS) {
         const raw = record(record(data.groups)[id]);
         const tasks = list(raw.tasks).map(task);
         const notApplicable = raw.notApplicable === undefined ? undefined : string(raw.notApplicable);
         if ((!tasks.length && !notApplicable) || (tasks.length && notApplicable)) {
             throw new Error(id + " requires tasks or an explicit notApplicable reason");
         }
-        if (["code", "docs"].includes(id) && notApplicable) {
+        if ((REQUIRED_GROUPS as readonly string[]).includes(id) && notApplicable) {
             throw new Error(id + " cannot be disabled");
         }
         groups[id] = { tasks, notApplicable };
     }
     const setup = list(data.setup).map(task);
     const tests = list(data.tests).map(task);
-    const all = [...setup, ...Object.values(groups).flatMap((group) => group.tasks), ...tests];
+    const impact = task(data.impact);
+    const all = [...setup, ...Object.values(groups).flatMap((group) => group.tasks), ...tests, impact];
     const ids = all.map((item) => item.id);
     if (new Set(ids).size !== ids.length) {
         throw new Error("Task IDs must be unique across groups");
@@ -45,5 +47,5 @@ export function parseConfig(value: unknown): Config {
     if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 3600000) {
         throw new Error("timeoutMs must be an integer from 1 to 3600000");
     }
-    return { setup, groups, tests, impact: task(data.impact), timeoutMs };
+    return { setup, groups, tests, impact, timeoutMs };
 }

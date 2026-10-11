@@ -4,6 +4,6 @@
 
 运行 audit 校验 coverage 完整, 检查每条 checker/fixture/evidence 路径确实存在且日志来自当前最终内容. 插入违规使对应检查点失败, 再用合规输入确认恢复. 不接受仅存在配置的证据
 
-完成文本产物的 prose-rules 校验和脚本 check_layout 校验, 确认 Agent Note 的 Code 与函数顶部锚点配对, 遵循宿主当前 notes 命令. 旧配置不兼容明确报告, 不绕开门禁制造通过
+目标项目的文本与代码产物由项目自己安装的 HC-TEXT/HC-DOCNAME/HC-DOCSIZE/HC-SIZE 等 checker 校验, hx-make-skill 的 prose-rules 与 check_layout 只用于修改本技能自身. 确认 Agent Note 的 Code 与函数顶部锚点配对, 遵循宿主当前 notes 命令. 旧配置不兼容明确报告, 不绕开门禁制造通过
 
 交付列出生效文件/命令、执行结果、历史问题和待 review Warning、blocked 及远程状态. 要求用户决定时给出具体可审查的方案, 不让确认替代已授权的本地实现工作

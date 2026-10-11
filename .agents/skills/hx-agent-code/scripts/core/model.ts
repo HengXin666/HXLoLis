@@ -1,5 +1,6 @@
 export type Change = { status: string; path: string; oldPath?: string };
-export type Scope = { mode: string; base: string; head: string; changes: Change[] };
+/** head is a tree ID for range and the literal mode name for worktree or staged snapshots */
+export type Scope = { mode: string; base: string; head: string; changes: Change[]; fallback?: string };
 export type Severity = "error" | "warning";
 export type Finding = {
     ruleId: string;
@@ -45,9 +46,13 @@ export function strings(value: unknown): string[] {
     return list(value).map(string);
 }
 
+export function isAbsoluteLiteral(value: string): boolean {
+    return /^(?:[\/\\~]|[A-Za-z]:(?:[\/\\]|$))/.test(value);
+}
+
 export function path(value: unknown): string {
     const result = string(value);
-    if (result.startsWith("/") || result.includes("\\") || result.includes("\0") || /[*?\[\]]/.test(result)) {
+    if (isAbsoluteLiteral(result) || result.includes("\\") || result.includes("\0") || /[*?\[\]]/.test(result)) {
         throw new Error("Expected an exact repository path: " + result);
     }
     if (result.split("/").some((part) => part === ".." || part === "." || part === "")) {
@@ -77,5 +82,9 @@ export function parseScope(value: unknown): Scope {
         }
         return change;
     });
-    return { mode, base: string(data.base), head: string(data.head), changes };
+    const scope: Scope = { mode, base: string(data.base), head: string(data.head), changes };
+    if (data.fallback !== undefined) {
+        scope.fallback = string(data.fallback);
+    }
+    return scope;
 }

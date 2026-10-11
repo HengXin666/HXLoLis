@@ -1,14 +1,46 @@
 import { execFileSync } from "node:child_process";
+import { EMPTY_BASE, GIT_MAX_BUFFER, UTF8 } from "./constants.ts";
 import type { Change, Scope } from "./model.ts";
 
-function git(root: string, args: string[], input?: string): string {
+export function git(root: string, args: string[], input?: string): string {
     return execFileSync("git", ["-C", root, ...args], {
-        encoding: "utf8", input, maxBuffer: 64 * 1024 * 1024, stdio: ["pipe", "pipe", "pipe"],
+        encoding: UTF8, input, maxBuffer: GIT_MAX_BUFFER, stdio: ["pipe", "pipe", "pipe"],
     });
 }
 
+export function gitLine(root: string, ...args: string[]): string {
+    return git(root, args).trim();
+}
+
+export function gitSucceeds(root: string, ...args: string[]): boolean {
+    try {
+        git(root, args);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+export function repositoryRoot(directory: string): string {
+    try {
+        return gitLine(directory, "rev-parse", "--show-toplevel");
+    } catch {
+        return directory;
+    }
+}
+
 function resolveTree(root: string, ref: string): string {
-    return git(root, ["rev-parse", "--verify", "--end-of-options", ref + "^{tree}"]).trim();
+    return gitLine(root, "rev-parse", "--verify", "--end-of-options", ref + "^{tree}");
+}
+
+function firstPerPath(groups: Change[][]): Change[] {
+    const result = new Map<string, Change>();
+    for (const change of groups.flat()) {
+        if (!result.has(change.path)) {
+            result.set(change.path, change);
+        }
+    }
+    return [...result.values()];
 }
 
 export function parseChanges(raw: string): Change[] {
@@ -36,15 +68,18 @@ export function parseChanges(raw: string): Change[] {
     return changes;
 }
 
+/** Write the empty tree only when it becomes a diff endpoint, so read only checkouts still work */
+function emptyTree(root: string): string {
+    return git(root, ["hash-object", "-w", "-t", "tree", "--stdin"], "").trim();
+}
+
 /**
  * Preserve all snapshot inputs before project adapters read file contents
  *
-
  * .agents/notes/implemented/process/2026-10-07-agent-code-installation-contract.md
  */
 export function collectScope(root: string, mode: string, base?: string, head?: string): Scope {
-    root = git(root, ["rev-parse", "--show-toplevel"]).trim();
-    const empty = git(root, ["hash-object", "-t", "tree", "--stdin"], "").trim();
+    root = gitLine(root, "rev-parse", "--show-toplevel");
     if (!["worktree", "staged", "range"].includes(mode)) {
         throw new Error("Unknown scope mode: " + mode);
     }
@@ -53,7 +88,7 @@ export function collectScope(root: string, mode: string, base?: string, head?: s
         if (!base || !head) {
             throw new Error("range requires base and head; use base EMPTY for an initial push");
         }
-        baseTree = base === "EMPTY" ? empty : resolveTree(root, base);
+        baseTree = base === EMPTY_BASE ? emptyTree(root) : resolveTree(root, base);
     } else {
         if (base || head) {
             throw new Error("Only range accepts explicit endpoints");
@@ -61,12 +96,12 @@ export function collectScope(root: string, mode: string, base?: string, head?: s
         try {
             baseTree = resolveTree(root, "HEAD");
         } catch {
-            const symbolic = git(root, ["symbolic-ref", "-q", "HEAD"]).trim();
-            const refs = git(root, ["for-each-ref", "--format=%(refname)", symbolic]).trim();
+            const symbolic = gitLine(root, "symbolic-ref", "-q", "HEAD");
+            const refs = gitLine(root, "for-each-ref", "--format=%(refname)", symbolic);
             if (refs) {
                 throw new Error("HEAD exists but cannot be read");
             }
-            baseTree = empty;
+            baseTree = emptyTree(root);
         }
     }
     const prefix = ["diff", "--no-ext-diff", "--no-textconv", "--name-status", "-z", "--find-renames"];
@@ -77,11 +112,13 @@ export function collectScope(root: string, mode: string, base?: string, head?: s
     } else if (mode === "staged") {
         changes = parseChanges(git(root, [...prefix, "--cached", baseTree, "--"]));
     } else {
-        changes = parseChanges(git(root, [...prefix, baseTree, "--"]));
-        changes.push(...parseChanges(git(root, [...prefix, "--cached", baseTree, "--"])));
-        changes.push(...parseChanges(git(root, [...prefix, "--"])));
         const untracked = git(root, ["ls-files", "--others", "--exclude-standard", "-z"]);
-        changes.push(...untracked.split("\0").filter(Boolean).map((path) => ({ status: "A", path })));
+        changes = firstPerPath([
+            parseChanges(git(root, [...prefix, baseTree, "--"])),
+            untracked.split("\0").filter(Boolean).map((path) => ({ status: "A", path })),
+            parseChanges(git(root, [...prefix, "--cached", baseTree, "--"])),
+            parseChanges(git(root, [...prefix, "--"])),
+        ]);
     }
     const unique = new Map(changes.map((item) => [JSON.stringify(item), item]));
     changes = [...unique.values()].sort((a, b) => {

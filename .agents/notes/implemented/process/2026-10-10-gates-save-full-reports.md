@@ -28,6 +28,8 @@ TypeScript UI 与质量检查使用技能内的 scripts/report.ts, 一并复制�
 
 GitHub 报告超过 10 条只发布数量与类型汇总并链接完整附件, 不超过 10 条保留行内定位和聚合. 不在报告中展开少量样例绕过阈值. 根 AGENTS 和技能生成契约约束后续新增门禁, 显式 dry-run 与 list 调研视图保持其用途
 
+hx-agent-code 的展示阈值定义为 `scripts/core/constants.ts` 的 DETAIL_LIMIT, 报告与 runner 共用
+
 ## Alternatives considered
 
 - 什么都不做 / 复用可选 --json: 没有迁移成本且能由调用者按需保存, 但默认提交检查仍刷屏并丢失截断部分, 因此采用默认完整落盘
