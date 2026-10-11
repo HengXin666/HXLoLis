@@ -34,16 +34,13 @@ function resolveTree(root: string, ref: string): string {
 }
 
 function firstPerPath(groups: Change[][]): Change[] {
-    const seen = new Set<string>();
-    const result: Change[] = [];
+    const result = new Map<string, Change>();
     for (const change of groups.flat()) {
-        const paths = change.oldPath ? [change.path, change.oldPath] : [change.path];
-        if (!paths.some((item) => seen.has(item))) {
-            paths.forEach((item) => seen.add(item));
-            result.push(change);
+        if (!result.has(change.path)) {
+            result.set(change.path, change);
         }
     }
-    return result;
+    return [...result.values()];
 }
 
 export function parseChanges(raw: string): Change[] {
@@ -78,7 +75,7 @@ export function parseChanges(raw: string): Change[] {
  */
 export function collectScope(root: string, mode: string, base?: string, head?: string): Scope {
     root = gitLine(root, "rev-parse", "--show-toplevel");
-    const empty = git(root, ["hash-object", "-t", "tree", "--stdin"], "").trim();
+    const empty = git(root, ["hash-object", "-w", "-t", "tree", "--stdin"], "").trim();
     if (!["worktree", "staged", "range"].includes(mode)) {
         throw new Error("Unknown scope mode: " + mode);
     }
