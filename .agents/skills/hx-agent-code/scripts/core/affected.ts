@@ -1,3 +1,4 @@
+import { EVENT_LOCAL, EVENT_PR, EVENT_PUSH } from "./constants.ts";
 import { list, path, record, sorted, strings } from "./model.ts";
 import type { Graph, Module, Plan, Scope } from "./model.ts";
 
@@ -34,16 +35,19 @@ function within(file: string, prefix: string): boolean {
 }
 
 export function selectTests(scope: Scope, graph: Graph, event: string): Plan {
-    if (!["local", "push", "pr"].includes(event)) {
+    if (![EVENT_LOCAL, EVENT_PUSH, EVENT_PR].includes(event)) {
         throw new Error("Unknown test event: " + event);
     }
     const reasons = new Set<string>();
     const files = new Set(scope.changes.flatMap((change) => {
         return change.oldPath ? [change.path, change.oldPath] : [change.path];
     }));
-    let full = event === "pr" || !graph.complete;
-    if (event === "pr") {
+    let full = event === EVENT_PR || !graph.complete || Boolean(scope.fallback);
+    if (event === EVENT_PR) {
         reasons.add("PR requires all tests");
+    }
+    if (scope.fallback) {
+        reasons.add("Scope fallback: " + scope.fallback);
     }
     if (!graph.complete) {
         reasons.add("Incomplete dependency graph");
