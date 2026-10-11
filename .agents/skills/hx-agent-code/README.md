@@ -14,7 +14,8 @@
 以下命令在仓库根执行, 仅文档整理不重跑代码测试; 代码改动完成后统一执行受影响测试
 
 ```sh
-node --test .agents/skills/hx-agent-code/scripts/tests/*.test.ts
+node --test .agents/skills/hx-agent-code/scripts/tests/*.test.ts .agents/skills/hx-agent-code/scripts/rules/tests/*.test.ts
+git submodule update --init HXLoLi
 uv run .agents/skills/hx-make-skill/scripts/validate_skill.py .agents/skills/hx-agent-code
 uv run .agents/skills/hx-make-skill/scripts/prose_rules.py --check .agents/skills/hx-agent-code
 uv run .agents/skills/hx-make-skill/scripts/check_layout.py .agents/skills/hx-agent-code
