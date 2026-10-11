@@ -25,7 +25,7 @@ node <skill>/scripts/cli.ts abspath --tokens scripts/.hx_code_quality/cache/toke
 - staged: HEAD 与 index 比, checker 必须从 index 读取内容, 不能检查工作树冒充暂存检查. 格式化 index 可导出临时快照; 部分暂存时不自动 git add 工作树版本
 - range: 精确 base/head, CI 通过可信事件取 SHA; PR 使用 merge-base(base, head) 与实际 PR head, push 使用 before/after. before 为全 0 或在 clone 中不可达 (新分支, force push) 时用默认分支与 after 的 merge-base; 只有推送默认分支本身的仓库首个提交才用空树, 其余取不到基点时用空树并写 scope.fallback, 测试选择随之全量. 不凭 HEAD~1 猜多提交范围
 - head 字段在 range 模式是树 SHA, worktree/staged 模式是模式名字面量, 内容读取由快照适配器负责
-- worktree 合并 HEAD 与工作树之差, 未跟踪文件, 已暂存与未暂存四组结果, 每个路径只保留最先出现的一条, 不会同时出现 A/M/D 冲突状态
+- worktree 合并 HEAD 与工作树之差, 未跟踪文件, 已暂存与未暂存四组结果, 每个路径只保留最先出现的一条, 不会同时出现 A/M/D 冲突状态; 改名记录按新路径去重, 旧路径另有记录时两条都保留
 - 使用 NUL 路径解析, rename 同时保留旧名新名, delete 仍用于依赖/契约影响计算. 子模块变动标为子仓边界, 不递归混入父仓规则
 - diff 是入口, 可读完整文件/函数/类型/反向依赖图. AST/type checker 可分析更广上下文, 报告归属受影响范围; 根 AGENTS 改动必须检查整棵后代上下文
 - 接入项目 checker 时提供工作区/索引/提交树读取适配器, 禁止 scope 是 index 而实际工具读取工作区. 未支持的模式返回 Error
