@@ -36,7 +36,7 @@ runner 保存子进程原始日志, 统一报告生成后再输出摘要, 不直
 
 push 的 before 为全 0 或在 clone 中不可达 (新分支, force push) 时以默认分支与 after 的 merge-base 为基点并从该基点读取基线, 避免老项目每个新分支首推把全部历史违规算成新增; 仅仓库首个提交使用空树, 其余取不到基点时用空树并在 scope.fallback 记录原因, 测试选择全量. worktree 范围每个路径只保留一条变化. cli 的 --out 统一为前缀, 失败时覆盖同一前缀, 避免下游读到上一轮范围
 
-用户追加 HC-LITERAL (同值字面量在模块内出现 3 次及以上须提取到登记的常量目录) 与 HC-ABSPATH (禁止绝对路径字面量和以根开始的路径拼接), 均为 Error. 技能在 scripts/rules 提供基于 token JSON 的通用判定与 literals/abspath 子命令, 语言 lexer 由目标项目适配器实现, 与 affected 消费 graph JSON 的边界一致. 默认常量目录建议 shared/constants, 实际目录在取证时确定并登记到 scripts/quality/literals.json. 仓库路径校验同时拒绝盘符与 ~ 前缀. 技能固定 vendor 到目标仓库 `.agents/skills/hx-agent-code`, 工作流按此路径调用. 运行期只依赖 hx-agent-notes, hx-make-skill 只用于维护本技能, 依赖查找以 SKILL.md 可读为准. 全程只在取证后集中确认一次
+用户追加 HC-LITERAL (同值字面量在模块内出现 3 次及以上须提取到登记的常量目录) 与 HC-ABSPATH (禁止绝对路径字面量和以根开始的路径拼接), 均为 Error. 技能在 scripts/rules 提供基于 token JSON 的通用判定与 literals/abspath 子命令, 语言 lexer 由目标项目适配器实现, 与 affected 消费 graph JSON 的边界一致. 默认常量目录建议 shared/constants, 实际目录在取证时确定并登记到 scripts/quality/literals.json. 仓库路径校验同时拒绝盘符与 ~ 前缀. HC-ABSPATH 只对适配器标为 path 的值判定以根开头, 其他值位置只认盘符, UNC 与 ~/ 这类不会是路由的形式, 避免 Web 路由误报. 两条规则的指纹使用适配器给出的稳定 anchor, 缺失时退回行号, 不用遍历序号. merge-base 失败或无共同祖先时同样走空树全量兜底, 空树对象在使用前写入仓库. worktree 范围按路径去重, 暂存改名的新旧路径都保留. 技能固定 vendor 到目标仓库 `.agents/skills/hx-agent-code`, 工作流按此路径调用. 运行期只依赖 hx-agent-notes, hx-make-skill 只用于维护本技能, 依赖查找以 SKILL.md 可读为准. 全程只在取证后集中确认一次
 
 ## Alternatives considered
 
