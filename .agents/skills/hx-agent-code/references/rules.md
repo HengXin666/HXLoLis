@@ -43,7 +43,7 @@
 | HC-CI | Error | GitHub 三个 push/PR 入口, diff 质量/文档, push affected 与 PR 全量测试, 非短路汇总 | 后续 job 仍运行 / 首错中断其他检查 |
 | HC-COLLAB | Error | GitHub Bug/Feature Issue 模板, PR 模板, CODEOWNERS, CONTRIBUTING 有实际内容和有效归属 | 有效 owner / 猜造用户名 |
 | HC-LITERAL | Error | 语言 lexer/AST 统计非类型位置的字符串与数字字面量, 同一值在同一模块 (或按配置全仓) 出现 3 次及以上必须提取到登记的常量目录并 import; 常量目录自身, 0/1/-1/空串, 布尔与 null, import 说明符, 类型字面量, 对象键和登记的 fixture 目录不计 | 同值 2 次 / 第 3 次出现 |
-| HC-ABSPATH | Error | 代码, 配置, 脚本与文档示例禁止绝对路径字面量及其拼接: 适配器标为 path 的值以 / ~ 盘符或 UNC 开头, 任意值位置的盘符, UNC 与 `~/` 路径, 以及 `join`/`resolve`/`Path`/`os.path.join` 等首参为根或盘符的调用; 运行期取得的根 (git toplevel, cwd, tmpdir, 宿主注入的环境变量如 GITHUB_EVENT_PATH) 允许, 标为 route/url 的路由与 URL path 不算 | 仓库相对路径或运行期根拼接 / `"/tmp/x"`, `join("/", a)`, `"C:\\x"` |
+| HC-ABSPATH | Error | 代码, 配置, 脚本与文档示例禁止绝对路径字面量及其拼接: 适配器标为 path 的值以 / ~ 盘符或 UNC 开头, 任意值位置的盘符, UNC (含 `//server/share`) 与 `~/` 路径 (单独的 `~` 不算), 以及 `join`/`resolve`/`Path`/`os.path.join` 等首参为根, 盘符或任意绝对路径 (如 `/tmp`) 的调用; 运行期取得的根 (git toplevel, cwd, tmpdir, 宿主注入的环境变量如 GITHUB_EVENT_PATH) 允许, 标为 route/url 的路由与 URL path 不算 | 仓库相对路径或运行期根拼接 / `"/tmp/x"`, `join("/", a)`, `"C:\\x"` |
 | HC-META | Error | 稳定 ID/等级/独立入口/正反探针/稳定输出, 注册与接线覆盖, 缺失报错 | 探针检测出违规 / 永远 PASS |
 
 ## 固定解释
