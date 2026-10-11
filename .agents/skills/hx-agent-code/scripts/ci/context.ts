@@ -25,7 +25,11 @@ function defaultBase(root: string, data: Record<string, unknown>, head: string):
     }
     for (const ref of ["refs/remotes/origin/" + branch, "refs/heads/" + branch]) {
         if (gitSucceeds(root, "rev-parse", "--verify", "--quiet", ref)) {
-            return gitLine(root, "merge-base", ref, head);
+            try {
+                return gitLine(root, "merge-base", ref, head) || undefined;
+            } catch {
+                return undefined;
+            }
         }
     }
     return undefined;
@@ -42,7 +46,10 @@ function pushBase(root: string, data: Record<string, unknown>, head: string): { 
     if (base) {
         return { base };
     }
-    if (created && !gitSucceeds(root, "rev-parse", "--verify", "--quiet", head + "^")) {
+    const repository = data.repository === undefined ? {} : record(data.repository);
+    const branch = typeof repository.default_branch === "string" ? repository.default_branch : "";
+    const rootCommit = !gitSucceeds(root, "rev-parse", "--verify", "--quiet", head + "^");
+    if (created && (data.ref === "refs/heads/" + branch || (!branch && rootCommit))) {
         return { base: EMPTY_BASE };
     }
     return { base: EMPTY_BASE, fallback: reason + " without a reachable default branch, scanning everything" };
