@@ -42,6 +42,8 @@
 | HC-CONTRACT | Error | docs/reference/api 的 YAML 契约和实现匹配, 契约变化触发相关模块及契约测试 | 同步类型 / 只改 YAML |
 | HC-CI | Error | GitHub 三个 push/PR 入口, diff 质量/文档, push affected 与 PR 全量测试, 非短路汇总 | 后续 job 仍运行 / 首错中断其他检查 |
 | HC-COLLAB | Error | GitHub Bug/Feature Issue 模板, PR 模板, CODEOWNERS, CONTRIBUTING 有实际内容和有效归属 | 有效 owner / 猜造用户名 |
+| HC-LITERAL | Error | 语言 lexer/AST 统计非类型位置的字符串与数字字面量, 同一值在同一模块 (或按配置全仓) 出现 3 次及以上必须提取到登记的常量目录并 import; 常量目录自身, 0/1/-1/空串, 布尔与 null, import 说明符, 类型字面量, 对象键和登记的 fixture 目录不计 | 同值 2 次 / 第 3 次出现 |
+| HC-ABSPATH | Error | 代码, 配置, 脚本与文档示例禁止绝对路径字面量及其拼接: 以 / ~ 盘符或 UNC 开头的字面量, 以及 `join`/`resolve`/`Path`/`os.path.join` 等首参为根或盘符的调用; 运行期取得的根 (git toplevel, cwd, tmpdir, 宿主注入的环境变量如 GITHUB_EVENT_PATH) 允许 | 仓库相对路径或运行期根拼接 / `"/tmp/x"`, `join("/", a)`, `"C:\\x"` |
 | HC-META | Error | 稳定 ID/等级/独立入口/正反探针/稳定输出, 注册与接线覆盖, 缺失报错 | 探针检测出违规 / 永远 PASS |
 
 ## 固定解释
@@ -53,3 +55,5 @@
 - Python 推荐不能变成强制迁移旧项目的授权. 记录存量栈, 新前端采用 React + TS 的要求不被静默豁免; 用户另有明确约束时写明差异
 - HC-PERF 的测量方法与默认预算见 references/testing.md 的性能一节; 放宽预算与 baseline 同等对待, 由元门禁从可信基准差分发现
 - 目录豁免用 `{ "path": "src/user", "reason": "同一职责", "expires_on_change": true }`, 同时保存批准时内容摘要. 目录再次变更即失效并重新检查, 不能自动刷新摘要
+- HC-LITERAL 的计数范围, 常量目录, 阈值收紧和精确豁免登记在 scripts/quality/literals.json, 不按目录整体忽略业务代码; 阈值只能从 3 收紧. 提取后的常量定义位置 Python 由 HC-PY-CONST 约束, TS 的大写 export const 同样只在登记的常量目录定义
+- HC-ABSPATH 的例外按文件与值精确登记并写原因, 单独的 `/` 或 `\` 分隔符字面量不算路径, 作为路径调用首参时才算根
