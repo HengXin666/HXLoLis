@@ -14,6 +14,8 @@ Decision-ID: agent-code-installation-contract
 - `.agents/skills/hx-agent-code/scripts/cli.ts`
 - `.agents/skills/hx-agent-code/scripts/ci/run.ts`
 - `.agents/skills/hx-agent-code/scripts/core/scope.ts`
+- `.agents/skills/hx-agent-code/scripts/rules/literal.ts`
+- `.agents/skills/hx-agent-code/scripts/rules/tests/rules.test.ts`
 - `.agents/skills/hx-agent-code/scripts/tests/scope.test.ts`
 
 ## Decision
@@ -30,12 +32,17 @@ Diff 保留 staged、unstaged、untracked、rename 和 delete, 暂存/提交内�
 
 页面与 API 性能预算按路由/契约逐项覆盖, 冷缓存页面和真实 HTTP/隔离存储案例纳入 affected 测试. 延迟反例与无效采样必须失败, lab 分位数不宣称线上指标. 文档命名使用小写 kebab 与精确保留文件名, 禁止版本副本词段, 目标项目文风不继承技能句末限制
 
-runner 保存子进程原始日志, 统一报告生成后再输出摘要, 不直接透传检查命令的 stdout 或 stderr
+runner 保存子进程原始日志, 统一报告生成后再输出摘要, 不直接透传检查命令的 stdout 或 stderr. HC-CI finding 以 [runner] 或 [task] 区分 runner 故障与业务失败. ci.ts 与 cli.ts 先用 git 解析仓库根, 状态目录, 规则 ID, 事件名和阈值集中在 scripts/core/constants.ts, git 调用统一使用 core/scope.ts 的封装
+
+push 的 before 为全 0 或在 clone 中不可达 (新分支, force push) 时以默认分支与 after 的 merge-base 为基点并从该基点读取基线, 避免老项目每个新分支首推把全部历史违规算成新增; 仅仓库首个提交使用空树, 其余取不到基点时用空树并在 scope.fallback 记录原因, 测试选择全量. worktree 范围每个路径只保留一条变化. cli 的 --out 统一为前缀, 失败时覆盖同一前缀, 避免下游读到上一轮范围
+
+用户追加 HC-LITERAL (同值字面量在模块内出现 3 次及以上须提取到登记的常量目录) 与 HC-ABSPATH (禁止绝对路径字面量和以根开始的路径拼接), 均为 Error. 技能在 scripts/rules 提供基于 token JSON 的通用判定与 literals/abspath 子命令, 语言 lexer 由目标项目适配器实现, 与 affected 消费 graph JSON 的边界一致. 默认常量目录建议 shared/constants, 实际目录在取证时确定并登记到 scripts/quality/literals.json. 仓库路径校验同时拒绝盘符与 ~ 前缀. 技能固定 vendor 到目标仓库 `.agents/skills/hx-agent-code`, 工作流按此路径调用. 运行期只依赖 hx-agent-notes, hx-make-skill 只用于维护本技能, 依赖查找以 SKILL.md 可读为准. 全程只在取证后集中确认一次
 
 ## Alternatives considered
 
 - 什么都不做 / 复用现有 hx-code-quality: 现有技能已有成熟的项目取证和候选模板, 没有新入口维护成本; 但其中首错即停和分轮增量要求与本次要求不同, 直接引用会引入冲突, 因此保留旧技能并用新入口表达新契约
 - 固化一套覆盖所有语言和 Agent 的安装器: 用户能直接执行一个命令, 接线成本低; 但目标项目的 AST、工具、宿主 hooks 和 GitHub 权限不同, 固定生成会把不适用配置冒充已安装, 因此只固化跨项目算法
+- 用户追加规则只写进规则目录, 不带脚本: 技能保持只有文档的最小改动; 但阈值计数, 豁免匹配和绝对路径判定在每个项目重复实现容易漂移, 因此提供 token 级通用算法而把 lexer 留给项目
 - 只有说明文档: 适配自由度最高且无需维护脚本; 但 Diff 路径、基线身份和测试闭包是重复且容易出错的机制, 因此提供可执行核心与隔离仓库测试
 - 将维护验证保留在 SKILL 正文: 调用者无需另找文件即可知道完整验证方法; 但普通使用不需要验证技能自身, 每次加载增加无关上下文, 因此只在正文保留三条自身门禁命令, 完整维护说明在 README 按需读取
 
