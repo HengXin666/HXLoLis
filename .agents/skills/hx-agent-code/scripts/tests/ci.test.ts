@@ -119,6 +119,8 @@ test("orphan pushes and missing default branches fall back to a full scan instea
         assert.equal(runCI(repo.root, "code"), 0);
         const report = repo.json("scripts/.hx_code_quality/reports/code.json");
         assert.equal(report.runnerErrors, 0);
+        const scope = repo.json("scripts/.hx_code_quality/reports/scope-code.json");
+        assert.match(scope.fallback, /default branch/);
     } finally {
         repo.cleanup();
     }
