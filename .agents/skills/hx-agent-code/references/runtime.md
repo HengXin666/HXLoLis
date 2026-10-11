@@ -7,21 +7,25 @@
 内置 helpers 是可复用算法, 不声称已为任意仓库实现全部语言 checker. 按 coverage.json 为每条适用规则完成项目适配器, 接入真实工具和 fixture, 缺任一项不交付完成. 安装方式只有一种: 固定版本 vendor 整个 skill 到目标仓库, CLI 与 CI 都从 vendor 目录运行, 不拆出 core 单独复制
 
 ```sh
-node <skill>/scripts/cli.ts scope --root . --mode worktree --out /tmp/hc-scope.json
-node <skill>/scripts/cli.ts scope --root . --mode staged --out /tmp/hc-index.json
-node <skill>/scripts/cli.ts scope --root . --mode range --base <sha> --head <sha> --out /tmp/hc-range.json
-node <skill>/scripts/cli.ts affected --scope /tmp/hc-scope.json --graph scripts/quality/graph.json --event local --out /tmp/hc-tests.json
-node <skill>/scripts/cli.ts report --input /tmp/findings.json --baseline scripts/quality/baseline.json --out scripts/.hx_code_quality/reports/review
-node <skill>/scripts/cli.ts audit --manifest scripts/quality/coverage.json --out /tmp/hc-audit
+node <skill>/scripts/cli.ts scope --root . --mode worktree --out scripts/.hx_code_quality/cache/scope
+node <skill>/scripts/cli.ts scope --root . --mode staged --out scripts/.hx_code_quality/cache/index
+node <skill>/scripts/cli.ts scope --root . --mode range --base <sha> --head <sha> --out scripts/.hx_code_quality/cache/range
+node <skill>/scripts/cli.ts affected --scope scripts/.hx_code_quality/cache/scope.json --graph scripts/quality/graph.json --event local --out scripts/.hx_code_quality/cache/tests
+node <skill>/scripts/cli.ts report --input scripts/.hx_code_quality/cache/findings.json --baseline scripts/quality/baseline.json --out scripts/.hx_code_quality/reports/review
+node <skill>/scripts/cli.ts audit --manifest scripts/quality/coverage.json --out scripts/.hx_code_quality/reports/audit
+node <skill>/scripts/cli.ts literals --tokens scripts/.hx_code_quality/cache/tokens.json --config scripts/quality/literals.json --out scripts/.hx_code_quality/reports/literals
+node <skill>/scripts/cli.ts abspath --tokens scripts/.hx_code_quality/cache/tokens.json --out scripts/.hx_code_quality/reports/abspath
 ```
 
-report 与 audit 有 Error 返回 1, 输入/工具错误返回 2, 只有 Warning 返回 0. 未知选项拒绝. scope/affected 不执行测试. 具体 JSON 类型见 scripts/core/model.ts, 示例见 assets/impact.example.json 和 assets/coverage.example.json
+所有子命令的 `--out` 都是不带扩展名的前缀, scope/affected 写 `<out>.json`, 其余写 `<out>.json` 与 `<out>.md`. 失败时先删除旧的同名输出, 再在同一前缀写入 tool-error 报告, 下游读到的不会是上一轮范围. 未给 `--out` 时报告写到仓库根解析出的 `scripts/.hx_code_quality/reports/cli-error`. report, audit, literals, abspath 有 Error 返回 1, 输入/工具错误返回 2, 只有 Warning 返回 0. 未知选项拒绝. scope/affected 不执行测试. 具体 JSON 类型见 scripts/core/model.ts, 示例见 assets/impact.example.json 和 assets/coverage.example.json
 
 ## 快照语义
 
 - worktree: HEAD 与最终工作树之差, 包括 staged + unstaged + untracked, 排除 ignored; 尚无 HEAD 时与空树比. staged 后又还原工作树的文件仍纳入检查
 - staged: HEAD 与 index 比, checker 必须从 index 读取内容, 不能检查工作树冒充暂存检查. 格式化 index 可导出临时快照; 部分暂存时不自动 git add 工作树版本
-- range: 精确 base/head, CI 通过可信事件取 SHA; PR 使用 merge-base(base, head) 与实际 PR head, push 使用 before/after, 首次 push 使用空树. 不凭 HEAD~1 猜多提交范围
+- range: 精确 base/head, CI 通过可信事件取 SHA; PR 使用 merge-base(base, head) 与实际 PR head, push 使用 before/after. before 为全 0 或在 clone 中不可达 (新分支, force push) 时用默认分支与 after 的 merge-base; 只有推送默认分支本身的仓库首个提交才用空树, 其余取不到基点时用空树并写 scope.fallback, 测试选择随之全量. 不凭 HEAD~1 猜多提交范围
+- head 字段在 range 模式是树 SHA, worktree/staged 模式是模式名字面量, 内容读取由快照适配器负责
+- worktree 合并 HEAD 与工作树之差, 未跟踪文件, 已暂存与未暂存四组结果, 每个路径只保留最先出现的一条, 不会同时出现 A/M/D 冲突状态
 - 使用 NUL 路径解析, rename 同时保留旧名新名, delete 仍用于依赖/契约影响计算. 子模块变动标为子仓边界, 不递归混入父仓规则
 - diff 是入口, 可读完整文件/函数/类型/反向依赖图. AST/type checker 可分析更广上下文, 报告归属受影响范围; 根 AGENTS 改动必须检查整棵后代上下文
 - 接入项目 checker 时提供工作区/索引/提交树读取适配器, 禁止 scope 是 index 而实际工具读取工作区. 未支持的模式返回 Error
@@ -56,6 +60,8 @@ Warning 汇总为待 review 项, 不改变退出码; Error 阻止任务完成/pu
 
 同时保存违规身份和数值上限, 不允许旧问题减少一个后新增另一个因总数相同通过. rename 不自动搬豁免. 被扫描范围内消失项应删除, 未扫描范围不得误删. report 仅按已批准精确指纹分类, 不负责批准或修改 baseline, 可信加载与棘轮由项目适配器实施
 
+## 输出展示
+
 所有门禁先保存本次完整诊断文件, 包括成功结果和工具故障. 对外按本次问题总数决定展示: 超过 10 条只列数量与类型统计, 不列逐项详情; 不超过 10 条才可展开全部详情. 错误, 警告和待审核合计计数, 不按类型拆开绕过阈值. 终端, hook, CI 摘要与机器人评论遵守同一规则, 附完整报告路径或 artifact 链接. 子进程 stdout/stderr 与复现命令写入文件, 不直接透传; 报告写入失败按工具错误失败, 保持原校验退出码语义
 
-CI 保存每个任务的命令, 退出状态, stdout 和 stderr 到 reports/<分组>-tasks/<任务>. json, 然后展示分组报告摘要. findings 格式仍从子进程 stdout 读取 JSON, 不向用户透传
+CI 的 HC-CI finding 以 `[runner]` 或 `[task]` 开头区分 runner 故障与 checker 业务失败, 分组 JSON 另记 runnerErrors 计数. CI 保存每个任务的命令, 退出状态, stdout 和 stderr 到 `reports/<分组>-tasks/<任务>.json`, 然后展示分组报告摘要. findings 格式仍从子进程 stdout 读取 JSON, 不向用户透传
