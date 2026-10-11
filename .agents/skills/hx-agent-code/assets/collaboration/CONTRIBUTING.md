@@ -2,7 +2,7 @@
 
 ## Setup
 
-Use the project's pinned Node, pnpm, Python and uv versions, install dependencies from committed lockfiles
+Use the project's pinned Node, pnpm, Python and uv versions, install dependencies from committed lockfiles with `pnpm install --frozen-lockfile` and `uv sync --locked`
 
 ## Local checks
 
@@ -10,7 +10,7 @@ Run the installed formatter and quality entrypoint after completing the change, 
 
 Use `pnpm test:affected` for the final local Diff, `pnpm test` for the full suite, `pnpm test` followed by a business module name for a focused run
 
-Use `pnpm test:backend`, `pnpm test:frontend`, `pnpm test:contract` and `pnpm test:e2e` for individual layers
+Use `pnpm test:backend`, `pnpm test:frontend`, `pnpm test:contract`, `pnpm test:e2e` and `pnpm test:perf` for individual layers, Python-only layers delegate to `uv run` behind the same entries
 
 ## Git and CI
 
