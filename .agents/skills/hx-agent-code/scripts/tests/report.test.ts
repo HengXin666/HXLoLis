@@ -103,6 +103,7 @@ test("reports expand ten findings and summarize eleven without losing stored fin
         const text = captureReport(count);
         assert.equal(text.includes("detail-0"), count > 0 && count <= 10);
         assert(text.includes(count + " 项问题"));
-        assert.equal(makeReport(Array.from({ length: count }, (_, i) => finding("detail-" + i)), []).json.findings.length, count);
+        const findings = Array.from({ length: count }, (_, i) => finding("detail-" + i));
+        assert.equal(makeReport(findings, []).json.findings.length, count);
     }
 });
