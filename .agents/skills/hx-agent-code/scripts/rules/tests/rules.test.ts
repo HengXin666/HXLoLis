@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { path } from "../../core/model.ts";
 import { checkLiterals } from "../literal.ts";
-import { checkAbsolutePaths, isAbsoluteValue } from "../abspath.ts";
+import { checkAbsolutePaths, isAbsoluteValue, isUnambiguousPath } from "../abspath.ts";
+import { makeReport } from "../../core/report.ts";
 
 const CONFIG = { scope: "module", constantsDirs: ["src/shared/constants"] };
 
@@ -29,6 +30,20 @@ test("HC-LITERAL passes two repeats and fails the third", () => {
     assert.equal(new Set(findings.map((item) => item.fingerprint)).size, 3);
 });
 
+test("HC-LITERAL keeps a new occurrence new after an approved one is removed", () => {
+    const at = (anchor: string, line: number) => literal("src/user/a.ts", "pending", line, { symbol: "load", anchor });
+    const approved = checkLiterals(tokens([at("s1", 1), at("s2", 2), at("s3", 3)]), CONFIG);
+    const baseline = approved.map((item) => ({ ...item, reason: "legacy", approvedBy: "owner" }));
+    const shifted = checkLiterals(tokens([at("s0", 1), at("s1", 2), at("s2", 3)]), CONFIG);
+    const report = makeReport(shifted, baseline);
+    assert.equal(report.json.errors, 1);
+    assert.equal(report.json.historical, 2);
+    const unanchored = (line: number) => literal("src/user/a.ts", "pending", line);
+    const moved = checkLiterals(tokens([unanchored(5), unanchored(6), unanchored(7)]), CONFIG);
+    const lined = checkLiterals(tokens([unanchored(1), unanchored(2), unanchored(3)]), CONFIG);
+    assert.equal(makeReport(moved, lined.map((item) => ({ ...item, reason: "x", approvedBy: "y" }))).json.errors, 3);
+});
+
 test("HC-LITERAL ignores constants, trivial values, imports and types", () => {
     const items = [
         literal("src/shared/constants/user.ts", "pending"),
@@ -47,22 +62,38 @@ test("HC-LITERAL rejects incomplete input and looser thresholds", () => {
     assert.throws(() => checkLiterals(tokens([]), { scope: "module", constantsDirs: [] }));
 });
 
-test("HC-ABSPATH flags roots, home and drives but allows runtime roots", () => {
-    for (const value of ["/x", "~/x", "C:\\\\x", "C:/x", "\\\\\\\\host\\\\share", "/tmp/x"]) {
+test("HC-ABSPATH flags rooted values in path context and unambiguous paths anywhere", () => {
+    for (const value of ["/x", "~/x", "C:\\x", "C:/x", "\\\\host\\share", "/tmp/x"]) {
         assert(isAbsoluteValue(value), value);
     }
-    for (const value of ["src/x", "./x", "/", "\\\\", "a:b"]) {
+    for (const value of ["src/x", "./x", "/", "\\", "a:b"]) {
         assert(!isAbsoluteValue(value), value);
     }
+    for (const value of ["C:\\x", "C:/x", "\\\\host\\share", "~/x"]) {
+        assert(isUnambiguousPath(value), value);
+    }
+    for (const value of ["/api/users", "\\d+", "/tmp/x"]) {
+        assert(!isUnambiguousPath(value), value);
+    }
     const items = [
-        literal("src/user/a.ts", "/tmp/x"),
+        literal("src/user/a.ts", "/tmp/x", 1, { role: "path" }),
         { path: "src/user/a.ts", line: 2, kind: "call", value: "join", args: ["/", null] },
         { path: "src/user/a.ts", line: 3, kind: "call", value: "join", args: [null, "cache"] },
-        literal("src/user/a.ts", "/var/run/allowed.sock", 4),
+        literal("src/user/a.ts", "/var/run/allowed.sock", 4, { role: "path" }),
+        literal("src/user/a.ts", "/api/users", 5),
+        literal("src/user/a.ts", "/users/:id", 6, { role: "route" }),
+        literal("src/user/a.ts", "\\d+", 7),
+        literal("src/user/a.ts", "C:\\data", 8),
     ];
     const config = { allow: [{ path: "src/user/a.ts", value: "/var/run/allowed.sock", reason: "Host socket" }] };
     const findings = checkAbsolutePaths(tokens(items), config);
-    assert.deepEqual(findings.map((item) => item.line), [1, 2]);
+    assert.deepEqual(findings.map((item) => item.line), [1, 2, 8]);
+});
+
+test("HC-ABSPATH gives repeated values distinct fingerprints", () => {
+    const items = [1, 2].map((line) => literal("src/user/a.ts", "/etc/app.conf", line, { role: "path" }));
+    const findings = checkAbsolutePaths(tokens(items));
+    assert.equal(new Set(findings.map((item) => item.fingerprint)).size, 2);
 });
 
 test("repository paths reject drive letters and home prefixes", () => {
