@@ -7,6 +7,8 @@ import { eventScope } from "../ci/context.ts";
 import { parseConfig } from "../ci/config.ts";
 import { fixture } from "./ci-fixture.ts";
 
+const PLAN = "scripts/.hx_code_quality/reports/test-plan.json";
+
 test("runnable example builds once, push selects no docs tests and PR selects all", () => {
     const repo = fixture();
     try {
@@ -15,27 +17,33 @@ test("runnable example builds once, push selects no docs tests and PR selects al
         for (const group of ["code", "docs", "build", "compatibility", "tests"]) {
             assert.equal(runCI(repo.root, group), 0, group);
         }
-        assert.deepEqual(repo.json("scripts/.hx_code_quality/reports/test-plan.json").tests, []);
+        assert.deepEqual(repo.json(PLAN).tests, []);
         repo.write("event.json", JSON.stringify({ pull_request: { base: { sha: repo.base }, head: { sha: head } } }));
         process.env.GITHUB_EVENT_NAME = "pull_request";
         assert.equal(runCI(repo.root, "tests"), 0);
-        assert.deepEqual(repo.json("scripts/.hx_code_quality/reports/test-plan.json").tests, ["value:unit"]);
-        assert.equal(repo.json("scripts/.hx_code_quality/reports/test-plan.json").full, true);
+        assert.deepEqual(repo.json(PLAN).tests, ["value:unit"]);
+        assert.equal(repo.json(PLAN).full, true);
     } finally {
         repo.cleanup();
     }
 });
 
 test("multiple failures, malformed output and a missing command are all reported", () => {
-    const root = process.cwd();
-    const results = runTasks(root, [
-        { id: "a", command: [process.execPath, "-e", "process.exit(1)"], format: "exit" },
-        { id: "b", command: [process.execPath, "-e", "process.exit(2)"], format: "exit" },
-        { id: "c", command: [process.execPath, "-e", "process.stdout.write('not json')"], format: "findings" },
-        { id: "d", command: ["/missing/hc-checker"], format: "exit" },
-    ], 5000, process.env);
-    assert.equal(results.length, 4);
-    assert(results.every((item) => item.severity === "error"));
+    const repo = fixture();
+    try {
+        const results = runTasks(repo.root, [
+            { id: "a", command: [process.execPath, "-e", "process.exit(1)"], format: "exit" },
+            { id: "b", command: [process.execPath, "-e", "process.exit(2)"], format: "exit" },
+            { id: "c", command: [process.execPath, "-e", "process.stdout.write('not json')"], format: "findings" },
+            { id: "d", command: ["hc-missing-checker-command"], format: "exit" },
+        ], 5000, process.env);
+        assert.equal(results.length, 4);
+        assert(results.every((item) => item.severity === "error"));
+        const kinds = results.map((item) => item.message.slice(0, 8));
+        assert.deepEqual(kinds, ["[task] a", "[task] b", "[runner]", "[runner]"]);
+    } finally {
+        repo.cleanup();
+    }
 });
 
 test("artifact corruption and invalid config cannot pass", () => {
@@ -45,7 +53,9 @@ test("artifact corruption and invalid config cannot pass", () => {
         assert.equal(runCI(repo.root, "build"), 0);
         repo.write("scripts/.hx_code_quality/build/value.txt", "corrupt");
         assert.equal(runCI(repo.root, "tests"), 1);
-        assert(repo.json("scripts/.hx_code_quality/reports/tests.json").findings[0].message.includes("manifest"));
+        const report = repo.json("scripts/.hx_code_quality/reports/tests.json");
+        assert(report.findings[0].message.includes("manifest"));
+        assert.equal(report.runnerErrors, 1);
         const config = repo.json("scripts/quality/ci.json");
         config.groups.code.tasks = [];
         assert.throws(() => parseConfig(config));
@@ -61,9 +71,35 @@ test("first push works and a mismatched checkout is rejected", () => {
     const repo = fixture();
     try {
         const head = repo.push();
-        assert(eventScope(repo.root, "push", { before: "0".repeat(40), after: head }).scope.changes.length > 0);
+        const zero = "0".repeat(40);
+        const first = eventScope(repo.root, "push", { before: zero, after: head }).scope;
+        assert(first.changes.length > 0);
+        assert(first.fallback);
         assert.throws(() => eventScope(repo.root, "push", { before: head, after: repo.base }));
         assert.throws(() => eventScope(repo.root, "workflow_dispatch", {}));
+    } finally {
+        repo.cleanup();
+    }
+});
+
+test("new branch and force push compare with the default branch instead of the empty tree", () => {
+    const repo = fixture();
+    try {
+        const main = repo.git("rev-parse", "--abbrev-ref", "HEAD");
+        repo.git("checkout", "-qb", "feature");
+        repo.write("src/value.txt", "ready\n");
+        repo.write("docs/guide.md", "# Feature guide\n");
+        const head = repo.push();
+        const repository = { default_branch: main };
+        const created = eventScope(repo.root, "push", {
+            before: "0".repeat(40), after: head, ref: "refs/heads/feature", repository,
+        }).scope;
+        assert.deepEqual(created.changes.map((item) => item.path), ["docs/guide.md"]);
+        assert.equal(created.fallback, undefined);
+        const forced = eventScope(repo.root, "push", {
+            before: "1".repeat(40), after: head, ref: "refs/heads/feature", repository,
+        }).scope;
+        assert.deepEqual(forced.changes.map((item) => item.path), ["docs/guide.md"]);
     } finally {
         repo.cleanup();
     }
@@ -94,11 +130,13 @@ test("runner preserves child output in files without streaming it", () => {
         return true;
     }) as typeof process.stdout.write;
     try {
-        const results = runTasks(repo.root, [{ id: "verbose", format: "exit", command: [process.execPath, "-e",
-            "process.stdout.write('raw output'); process.stderr.write('raw error'); process.exit(1)"] }], 5000, process.env);
+        const script = "process.stdout.write('raw output'); process.stderr.write('raw error'); process.exit(1)";
+        const command = [process.execPath, "-e", script];
+        const results = runTasks(repo.root, [{ id: "verbose", format: "exit", command }], 5000, process.env);
         assert.equal(results.length, 1);
         assert.deepEqual(messages, []);
-        const saved = JSON.parse(readFileSync(join(repo.root, "scripts/.hx_code_quality/reports/tasks/verbose.json"), "utf8"));
+        const log = join(repo.root, "scripts/.hx_code_quality/reports/tasks/verbose.json");
+        const saved = JSON.parse(readFileSync(log, "utf8"));
         assert.equal(saved.stdout, "raw output");
         assert.equal(saved.stderr, "raw error");
         assert.equal(saved.status, 1);
