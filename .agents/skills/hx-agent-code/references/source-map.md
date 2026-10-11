@@ -21,6 +21,7 @@
 | 三 测试 | HC-TEST/CONTRACT, testing 契约 | 按业务分层、统一入口、影响图、最终一轮、push/PR |
 | 四 元门禁 | HC-META, meta 契约 | 每 ID 独立正反探针、稳定结果、接线自证 |
 | 五 细节 | runtime 快照/Baseline | 全文件上下文、历史身份隔离、新增不借额度 |
+| 用户追加规则, 非原文章节 | HC-LITERAL/HC-ABSPATH, scripts/rules | 重复字面量阈值与绝对路径正反探针 |
 
 ## 本 bundle 验证边界
 
