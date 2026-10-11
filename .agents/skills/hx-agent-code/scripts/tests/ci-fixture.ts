@@ -13,7 +13,7 @@ export function fixture() {
     git("config", "user.email", "fixture@example.invalid");
     git("config", "user.name", "Quality fixture");
     git("config", "commit.gpgsign", "false");
-    git("config", "core.hooksPath", "/dev/null");
+    git("config", "core.hooksPath", ".git/hc-no-hooks");
     mkdirSync(join(root, "scripts/quality"), { recursive: true });
     mkdirSync(join(root, "src"));
     mkdirSync(join(root, "docs"));
