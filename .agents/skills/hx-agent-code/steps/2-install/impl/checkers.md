@@ -14,4 +14,4 @@ API 使用 `docs/reference/api/<module>.yaml` 作为统一契约, 生成或提�
 
 建立 base/head 图, 将 modules/inputs/contracts/global 转换成 selector 输入. 工具已提供可靠 affected 功能则复用, 同样验证未知路径/公共类型/契约触发和 PR 全量
 
-HC-LITERAL 与 HC-ABSPATH 由项目 lexer/AST 适配器产出 `scripts/rules/tokens.ts` 定义的 token JSON, 再交给技能的 literals/abspath 子命令, 不用正则扫描源码. 适配器标出 import 说明符, 类型字面量与对象键的 role, 未覆盖的语言或解析失败输出 complete 为 false 并失败. 修复重复字面量时放进登记的常量目录, 已存在同值常量就复用; 常量目录与计数范围写入 scripts/quality/literals.json. HC-ABSPATH 对 yaml/json/md 等纯文本按值判断, 代码中 join/resolve/Path/os.path.join 等调用由适配器产出 call token 并附首个字面量参数
+HC-LITERAL 与 HC-ABSPATH 由项目 lexer/AST 适配器产出 `scripts/rules/tokens.ts` 定义的 token JSON, 再交给技能的 literals/abspath 子命令, 不用正则扫描源码. 适配器标出 import 说明符, 类型字面量, 对象键, 路由与 URL (route/url) 以及文件路径语境 (path: fs API 参数, 路径调用参数, 配置与纯文本中的路径字段) 的 role, 并给每个 token 一个不依赖行号与遍历顺序的 anchor, 未覆盖的语言或解析失败输出 complete 为 false 并失败. 修复重复字面量时放进登记的常量目录, 已存在同值常量就复用; 常量目录与计数范围写入 scripts/quality/literals.json. HC-ABSPATH 对 yaml/json/md 等纯文本中的路径字段标 path 后按值判断, 代码中 join/resolve/Path/os.path.join 等调用由适配器产出 call token 并附首个字面量参数
