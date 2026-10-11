@@ -105,6 +105,25 @@ test("new branch and force push compare with the default branch instead of the e
     }
 });
 
+test("orphan pushes and missing default branches fall back to a full scan instead of a runner fault", () => {
+    const repo = fixture();
+    try {
+        const main = repo.git("rev-parse", "--abbrev-ref", "HEAD");
+        repo.git("checkout", "-q", "--orphan", "orphan");
+        const head = repo.push();
+        const event = {
+            before: "0".repeat(40), after: head, ref: "refs/heads/orphan", repository: { default_branch: main },
+        };
+        assert(eventScope(repo.root, "push", event).scope.fallback);
+        repo.write("event.json", JSON.stringify({ ...event, repository: { default_branch: "missing" } }));
+        assert.equal(runCI(repo.root, "code"), 0);
+        const report = repo.json("scripts/.hx_code_quality/reports/code.json");
+        assert.equal(report.runnerErrors, 0);
+    } finally {
+        repo.cleanup();
+    }
+});
+
 test("CI ignores a baseline introduced in the same untrusted change", () => {
     const repo = fixture();
     try {
