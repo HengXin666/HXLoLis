@@ -2,7 +2,7 @@ import { ERROR, LITERAL_RULE, LITERAL_THRESHOLD } from "../core/constants.ts";
 import { record } from "../core/model.ts";
 import { fingerprint } from "../core/report.ts";
 import type { Finding } from "../core/model.ts";
-import { allowances, allowed, directories, inside, parseTokens } from "./tokens.ts";
+import { allowances, allowed, directories, inside, isValueRole, occurrence, parseTokens } from "./tokens.ts";
 import type { Token } from "./tokens.ts";
 
 const TRIVIAL = new Set(["", "0", "1", "-1"]);
@@ -48,7 +48,7 @@ function group(item: Token, scope: LiteralConfig["scope"]): string {
 export function checkLiterals(tokens: unknown, config: unknown): Finding[] {
     const settings = parseLiteralConfig(config);
     const counted = parseTokens(tokens).filter((item) => {
-        return item.role === "value" && item.kind !== "call" && !TRIVIAL.has(item.value)
+        return isValueRole(item) && item.kind !== "call" && !TRIVIAL.has(item.value)
             && !inside(item.path, [...settings.constantsDirs, ...settings.exemptDirs])
             && !allowed(item, settings.allow);
     });
@@ -62,17 +62,14 @@ export function checkLiterals(tokens: unknown, config: unknown): Finding[] {
         if (items.length < settings.threshold) {
             continue;
         }
-        const ordinals = new Map<string, number>();
         for (const item of items) {
-            const slot = JSON.stringify([item.path, item.symbol ?? "", item.value]);
-            const ordinal = (ordinals.get(slot) ?? 0) + 1;
-            ordinals.set(slot, ordinal);
+            const identity = item.value + "@" + occurrence(item);
             findings.push({
                 ruleId: LITERAL_RULE, severity: ERROR, path: item.path, line: item.line,
                 message: `${item.kind} literal ${JSON.stringify(item.value)} appears ${items.length} times; `
                     + "move it to a registered constants directory and import it",
                 evidence: "Token count in " + (settings.scope === "module" ? "module " + item.module : "repository"),
-                fingerprint: fingerprint(LITERAL_RULE, item.path, item.symbol ?? "", item.value + "#" + ordinal),
+                fingerprint: fingerprint(LITERAL_RULE, item.path, item.symbol ?? "", identity),
             });
         }
     }
