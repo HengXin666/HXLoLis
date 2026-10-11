@@ -69,10 +69,10 @@ test("HC-ABSPATH flags rooted values in path context and unambiguous paths anywh
     for (const value of ["src/x", "./x", "/", "\\", "a:b"]) {
         assert(!isAbsoluteValue(value), value);
     }
-    for (const value of ["C:\\x", "C:/x", "\\\\host\\share", "~/x"]) {
+    for (const value of ["C:\\x", "C:/x", "\\\\host\\share", "//host/share", "~/x"]) {
         assert(isUnambiguousPath(value), value);
     }
-    for (const value of ["/api/users", "\\d+", "/tmp/x"]) {
+    for (const value of ["/api/users", "\\d+", "/tmp/x", "~", "//"]) {
         assert(!isUnambiguousPath(value), value);
     }
     const items = [
@@ -84,10 +84,15 @@ test("HC-ABSPATH flags rooted values in path context and unambiguous paths anywh
         literal("src/user/a.ts", "/users/:id", 6, { role: "route" }),
         literal("src/user/a.ts", "\\d+", 7),
         literal("src/user/a.ts", "C:\\data", 8),
+        { path: "src/user/a.ts", line: 9, kind: "call", value: "join", args: ["/tmp", null] },
+        literal("src/user/a.ts", "//host/share", 10),
+        literal("src/user/a.ts", "~", 11),
+        literal("src/user/a.ts", "//cdn.example/app.js", 12, { role: "url" }),
+        { path: "src/user/a.ts", line: 13, kind: "call", value: "join", args: ["src", null] },
     ];
     const config = { allow: [{ path: "src/user/a.ts", value: "/var/run/allowed.sock", reason: "Host socket" }] };
     const findings = checkAbsolutePaths(tokens(items), config);
-    assert.deepEqual(findings.map((item) => item.line), [1, 2, 8]);
+    assert.deepEqual(findings.map((item) => item.line), [1, 2, 8, 9, 10]);
 });
 
 test("HC-ABSPATH gives repeated values distinct fingerprints", () => {
