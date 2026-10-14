@@ -9,7 +9,7 @@
 | quality-build.yml | 构建及兼容性, 调用 affected 测试 | 构建及兼容性, 调用全量测试 |
 | quality-tests.yml | workflow_call 接收 scope 和产物 | workflow_call 接收 full 和产物 |
 
-以 `assets/github/index.md` 索引的四个实际 YAML 为起点, 路径相对技能根. 复制到目标 `.github/workflows`, vendor 技能并按 `scripts/ci/index.md` 配置项目命令. fetch-depth 0 或精确拉取所需父提交; push 用 before/after, PR 用 merge-base 与 head, 核对 checkout 内容等于 head. 新分支或 force push 的 before 不可用时, 改用事件 repository.default_branch 与 after 的 merge-base, 基线也从该基点读取; 只有仓库首个提交才用空树, 其余兜底见 references/runtime.md 的快照语义. 删除分支明确不执行代码扫描
+以 `.agents/skills/hx-agent-code/assets/github/index.md` 索引的四个实际 YAML 为起点. 复制到目标 `.github/workflows`, vendor 技能并按 `.agents/skills/hx-agent-code/scripts/ci/index.md` 配置项目命令. fetch-depth 0 或精确拉取所需父提交; push 用 before/after, PR 用 merge-base 与 head, 核对 checkout 内容等于 head. 新分支或 force push 的 before 不可用时, 改用事件 repository.default_branch 与 after 的 merge-base, 基线也从该基点读取; 只有仓库首个提交才用空树, 其余兜底见 `.agents/skills/hx-agent-code/references/runtime.md` 的快照语义. 删除分支明确不执行代码扫描
 
 模板由 runner 内部收集每个独立检查的失败, 单组最后按结构化 Error 返回失败, 不需要给检查 step 设置 continue-on-error. build/compatibility 独立运行, 汇总 job 使用 always, 三个入口即使出错也上传 MD/JSON artifact. 如项目拆成多个 step, 才用 continue-on-error 收集状态并由最后一步判失败
 
@@ -27,6 +27,6 @@ AI CR 两项留为明确的未启用扩展: Warning 真问题筛选, 基于 diff
 
 ## 协作文件
 
-使用 `assets/collaboration/index.md` 索引的五个模板, 路径相对技能根. 生成或更新 `.github/ISSUE_TEMPLATE/bug.yml`, `.github/ISSUE_TEMPLATE/feature.yml`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/CODEOWNERS`, 根 `CONTRIBUTING.md`. Bug 包含复现/预期/实际/环境, Feature 包含问题/目标行为/边界, PR 包含 diff/契约/note/测试证据/待 review 项
+使用 `.agents/skills/hx-agent-code/assets/collaboration/index.md` 索引的五个模板. 生成或更新 `.github/ISSUE_TEMPLATE/bug.yml`, `.github/ISSUE_TEMPLATE/feature.yml`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/CODEOWNERS`, 根 `CONTRIBUTING.md`. Bug 包含复现/预期/实际/环境, Feature 包含问题/目标行为/边界, PR 包含 diff/契约/note/测试证据/待 review 项
 
 CODEOWNERS 从真实成员/团队或已有文件取得, 不猜用户名. 不知道 owner 时先完成其他工作, 此项列 blocked 并只询问缺失归属. CONTRIBUTING 给出 uv/pnpm 安装, 格式/检查/测试入口, baseline/豁免 review 及检查点行为

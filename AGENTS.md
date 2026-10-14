@@ -1,3 +1,7 @@
+## 编码规范
+
+@.agents/coding-rules.md
+
 <!-- agent-notes:start -->
 ## Agent Notes 红线
 

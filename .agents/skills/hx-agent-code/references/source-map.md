@@ -8,7 +8,7 @@
 | 一 总览 | SKILL 完成边界, runtime 检查点/等级 | 显式触发, 一次施工, Warning/Error MD/JSON |
 | 2.1 栈与复用 | HC-STACK/EXT/REUSE/DEPS, 取证推荐方案 | 架构与依赖候选比较, 逐级复用证据, 授权依据与迁移验收 |
 | 2.1.1 架构 | HC-BOUNDARY/DATA/CYCLE/DIR/DIR-MIX/PAIR | 公共接口, fake/real, AST 图, 目录豁免, 请求/路由集合 |
-| 2.1.2 格式 | HC-FORMAT/COMMENT-SPACE/SIZE, runtime 缓存 | 阈值正反例, 写入/Bash 与 commit 接线, commit 清缓存 |
+| 2.1.2 格式 | HC-FORMAT/COMMENT-SPACE/SIZE, runtime 缓存 | 阈值正反例, 回合结束与 commit 接线, commit 清缓存 |
 | 2.1.3 lint | HC-LINT/TYPE | 成熟工具与严格类型实际执行 |
 | 2.1.4 自定义 | HC-PY-IMPORT/PY-CONST/DOCSIG/DOCSYNC | AST 参数/返回值与函数 diff |
 | 2.1.5 注释 | HC-COMMENT/WHY/NOTES | 10 行上限, Why review, 双链 |

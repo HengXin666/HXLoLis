@@ -8,5 +8,5 @@
 
 已有 scripts/quality/coverage.json 时是补装: 只对未 implemented 的规则做差集取证, 已实现项只核对接线与证据仍然有效
 
-- `impl/repository.md`: 首次安装和补齐旧门禁时读取的取证方法
-- `impl/proposals.md`: 需要推荐架构, 技术栈或第三方库时读, 规定推荐产物与授权边界
+- `.agents/skills/hx-agent-code/steps/1-discover/impl/repository.md`: 首次安装和补齐旧门禁时读取的取证方法
+- `.agents/skills/hx-agent-code/steps/1-discover/impl/proposals.md`: 需要推荐架构, 技术栈或第三方库时读, 规定推荐产物与授权边界

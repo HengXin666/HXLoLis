@@ -12,7 +12,7 @@
 
 推荐与实施授权分别记录. 复用已有能力和任务范围内的常规可逆调整直接实施. 新增直接依赖, 跨大版本升级, 技术栈迁移或超出任务范围的架构变更, 先核对本次任务与会话中已有授权; 已授权即实施并记录依据, 仅未授权的选择需要用户决定
 
-需记录授权的选择写入版本化 scripts/quality/approvals.json, 格式参考 assets/approvals.example.json. 补丁/小版本与仅 lockfile 传递依赖变化不要求审批单, 仍由 HC-DEPS review, 标记 review-only. 待决定方案可保持 proposed, 不阻止已授权且无依赖关系的安装工作
+需记录授权的选择写入版本化 scripts/quality/approvals.json, 格式参考 `.agents/skills/hx-agent-code/assets/approvals.example.json`. 补丁/小版本与仅 lockfile 传递依赖变化不要求审批单, 仍由 HC-DEPS review, 标记 review-only. 待决定方案可保持 proposed, 不阻止已授权且无依赖关系的安装工作
 
 | 字段 | 内容 |
 |---|---|

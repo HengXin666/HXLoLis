@@ -7,17 +7,17 @@
 内置 helpers 是可复用算法, 不声称已为任意仓库实现全部语言 checker. 按 coverage.json 为每条适用规则完成项目适配器, 接入真实工具和 fixture, 缺任一项不交付完成. 安装方式只有一种: 固定版本 vendor 整个 skill 到目标仓库, CLI 与 CI 都从 vendor 目录运行, 不拆出 core 单独复制
 
 ```sh
-node <skill>/scripts/cli.ts scope --root . --mode worktree --out scripts/.hx_code_quality/cache/scope
-node <skill>/scripts/cli.ts scope --root . --mode staged --out scripts/.hx_code_quality/cache/index
-node <skill>/scripts/cli.ts scope --root . --mode range --base <sha> --head <sha> --out scripts/.hx_code_quality/cache/range
-node <skill>/scripts/cli.ts affected --scope scripts/.hx_code_quality/cache/scope.json --graph scripts/quality/graph.json --event local --out scripts/.hx_code_quality/cache/tests
-node <skill>/scripts/cli.ts report --input scripts/.hx_code_quality/cache/findings.json --baseline scripts/quality/baseline.json --out scripts/.hx_code_quality/reports/review
-node <skill>/scripts/cli.ts audit --manifest scripts/quality/coverage.json --out scripts/.hx_code_quality/reports/audit
-node <skill>/scripts/cli.ts literals --tokens scripts/.hx_code_quality/cache/tokens.json --config scripts/quality/literals.json --out scripts/.hx_code_quality/reports/literals
-node <skill>/scripts/cli.ts abspath --tokens scripts/.hx_code_quality/cache/tokens.json --out scripts/.hx_code_quality/reports/abspath
+node .agents/skills/hx-agent-code/scripts/cli.ts scope --root . --mode worktree --out scripts/.hx_code_quality/cache/scope
+node .agents/skills/hx-agent-code/scripts/cli.ts scope --root . --mode staged --out scripts/.hx_code_quality/cache/index
+node .agents/skills/hx-agent-code/scripts/cli.ts scope --root . --mode range --base <sha> --head <sha> --out scripts/.hx_code_quality/cache/range
+node .agents/skills/hx-agent-code/scripts/cli.ts affected --scope scripts/.hx_code_quality/cache/scope.json --graph scripts/quality/graph.json --event local --out scripts/.hx_code_quality/cache/tests
+node .agents/skills/hx-agent-code/scripts/cli.ts report --input scripts/.hx_code_quality/cache/findings.json --baseline scripts/quality/baseline.json --out scripts/.hx_code_quality/reports/review
+node .agents/skills/hx-agent-code/scripts/cli.ts audit --manifest scripts/quality/coverage.json --out scripts/.hx_code_quality/reports/audit
+node .agents/skills/hx-agent-code/scripts/cli.ts literals --tokens scripts/.hx_code_quality/cache/tokens.json --config scripts/quality/literals.json --out scripts/.hx_code_quality/reports/literals
+node .agents/skills/hx-agent-code/scripts/cli.ts abspath --tokens scripts/.hx_code_quality/cache/tokens.json --out scripts/.hx_code_quality/reports/abspath
 ```
 
-所有子命令的 `--out` 都是不带扩展名的前缀, scope/affected 写 `<out>.json`, 其余写 `<out>.json` 与 `<out>.md`. 失败时先删除旧的同名输出, 再在同一前缀写入 tool-error 报告, 下游读到的不会是上一轮范围. 未给 `--out` 时报告写到仓库根解析出的 `scripts/.hx_code_quality/reports/cli-error`. report, audit, literals, abspath 有 Error 返回 1, 输入/工具错误返回 2, 只有 Warning 返回 0. 未知选项拒绝. scope/affected 不执行测试. 具体 JSON 类型见 scripts/core/model.ts, 示例见 assets/impact.example.json 和 assets/coverage.example.json
+所有子命令的 `--out` 都是不带扩展名的前缀, scope/affected 写 `<out>.json`, 其余写 `<out>.json` 与 `<out>.md`. 失败时先删除旧的同名输出, 再在同一前缀写入 tool-error 报告, 下游读到的不会是上一轮范围. 未给 `--out` 时报告写到仓库根解析出的 `scripts/.hx_code_quality/reports/cli-error`. report, audit, literals, abspath 有 Error 返回 1, 输入/工具错误返回 2, 只有 Warning 返回 0. 未知选项拒绝. scope/affected 不执行测试. 具体 JSON 类型见 `.agents/skills/hx-agent-code/scripts/core/model.ts`, 示例见 `.agents/skills/hx-agent-code/assets/impact.example.json` 和 `.agents/skills/hx-agent-code/assets/coverage.example.json`
 
 ## 快照语义
 
@@ -34,15 +34,14 @@ node <skill>/scripts/cli.ts abspath --tokens scripts/.hx_code_quality/cache/toke
 
 | 检查点 | 运行内容 | 禁止事项 |
 |---|---|---|
-| Agent 写入/Bash 后 | 仅格式化变更文件, 更新内容缓存 | 不启动测试, 不递归触发自己 |
-| Agent 任务完成 | 最终 diff 静态扫描和一次 affected 测试, 汇总报告 | 有 Error 不宣称完成 |
+| Agent 回合/会话结束 | 最终 diff 格式化, 静态扫描和一次 affected 测试, 汇总报告 | 有 Error 不宣称完成, 不递归触发自己 |
 | pre-commit | staged 格式/静态检查 | 不夹带未暂存内容, 不跑整套测试 |
 | post-commit | 清除本次提交文件的缓存项 | 不丢仍未提交文件的缓存 |
 | pre-push | 待推送精确范围静态扫描和 affected 测试 | 不只查工作区或最近一条提交 |
 
-先检查目标 Agent 是否真正支持 write/Bash/stop hooks, 使用其实际配置和退出语义. 不臆造通用 hook 名. 不支持时保留任务完成脚本及 Git hooks, 将 Agent 自动触发列为 blocked 并如实交付限制
+Agent 编辑文件或执行 Bash 后不挂任何 hook, 不做格式化, 扫描或测试, 门禁全部后退到回合或会话结束时一次运行. 先检查目标 Agent 是否真正支持回合结束类 hook (如 stop), 使用其实际配置和退出语义, 不臆造通用 hook 名. 目标已有编辑后 hook 时改挂到回合结束入口, 保留其命令. 不支持结束事件时保留任务完成脚本及 Git hooks, 将 Agent 自动触发列为 blocked 并如实交付限制
 
-缓存 key 至少覆盖路径, 内容 hash, checker/version/config hash 和模式. 内容 hash 用 SHA-256, 缓存写在 `scripts/.hx_code_quality/cache/`, 只缓存成功结果. hook 加锁/重入标记, 格式化完成后再记录 hash. 不用格式缓存绕过任务完成测试
+缓存 key 至少覆盖路径, 内容 hash, checker/version/config hash 和模式. 内容 hash 用 SHA-256, 缓存写在 `scripts/.hx_code_quality/cache/`, 只缓存成功结果. hook 加锁/重入标记, 格式化完成后再记录 hash. 不用格式缓存绕过回合结束测试
 
 各检查均收集全量诊断, 不因首个 Error 提前退出. 依赖构建产物的测试在构建失败时记录 blocked, 其他独立项继续. 超时/命令不存在/无输出/非法 JSON 为 runner Error, 不能视作空诊断 PASS
 

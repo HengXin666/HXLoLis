@@ -13,7 +13,7 @@
 - Warning 不阻断, 新 Error 阻断, 历史已批准 Error 不阻断, 新违规不可借旧总量通过
 - baseline 增加/抬高阈值/规则移除/检查点脱线由可信基准差分发现
 - 契约变动双端 + contract 测试, PR 全量, push affected, real 缺环境不能绿
-- Agent 写入 hook 不跑测试, 完成时只执行最终计划, 格式缓存不会因配置变化误命中
+- Agent 编辑文件不触发 hook, 回合结束时只执行一次最终计划, 格式缓存不会因配置变化误命中
 - 新增路由或契约端点但未写 perf.json 预算, HC-PERF 失败; 可控延迟超预算和错误响应必须失败, 缺指标/样本不足不得跳过; 放宽预算由可信基准差分发现
 - 新增直接依赖缺授权时 HC-DEPS 标 unapproved, 小版本与传递依赖标 review-only; 已有明确授权不重复请求
 - 故意删掉注册表规则或接线后, 元门禁失败
@@ -22,6 +22,6 @@
 
 不复用当前 registry 作为唯一期望清单, 否则删规则后实际与期望一起变少. 用已提交规则目录, 可信 base 快照和逐项 coverage 审核变更. 新规范升级同步 probes 和 note
 
-skill 自带 core helper 测试只验证 scope/selection/report/audit, 不冒充项目 checker 测试. 安装后必须增加项目每条规则的真实探针及 hook/CI 接线验证
+skill 自带 core helper 测试只验证 scope/selection/report/audit, 不冒充项目 checker 测试. 安装后项目每条规则的真实探针由 hx-tdd 编写, 本技能只登记探针要求并验证 hook/CI 接线, 缺 hx-tdd 时探针标 blocked
 
 交付报告给出生效命令, 覆盖表, MD/JSON 问题报告, 已跑测试, 未解决 blocked, 远程是否实际执行. blocked 不算成功, 不为追求绿灯自动删掉适用要求
