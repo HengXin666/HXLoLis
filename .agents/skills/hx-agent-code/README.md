@@ -26,7 +26,7 @@ uv run scripts/redlines/agent_notes.py --diff
 
 另用项目已安装的 TypeScript 执行 strict/noEmit 类型检查, 显式启用 allowImportingTsExtensions 与 nodenext; 不为维护验证静默引入第三方库. 复杂代码或流程改动按 hx-make-skill 执行 fresh agent 实际任务验证, 不向它提供预期答案
 
-改动 CI 模板时用现有 YAML parser 或 actionlint 校验所有 YAML, 核对三个 push/PR 入口和 workflow_call, 本地 runner 集成测试不能冒充 GitHub 远程运行. 使用已有 TypeScript 检查 scripts 与 assets/example/task.ts, 示例源码同样受质量上限约束
+改动 CI 模板时用现有 YAML parser 或 actionlint 校验所有 YAML, 核对三个 push/PR 入口和 workflow_call, 本地 runner 集成测试不能冒充 GitHub 远程运行. 使用已有 TypeScript 检查 scripts 与 `assets/example/task.ts`, 示例源码同样受质量上限约束
 
 仓库级 Notes 门禁若因旧版配置与新版校验器不兼容而失败, 如实记录. 隔离仓库验证只能证明新增 note 与锚点配对, 不能冒充宿主全库通过
 

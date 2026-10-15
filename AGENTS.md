@@ -1,3 +1,8 @@
+## 编码规范
+
+写代码前先读 `.agents/coding-rules.md`, 不展开 `@` 导入的 Agent 也须读取
+@.agents/coding-rules.md
+
 <!-- agent-notes:start -->
 ## Agent Notes 红线
 
