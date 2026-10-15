@@ -10,7 +10,7 @@
 
 ## 配置
 
-`assets/example/ci.json` 是能直接配合示例 `assets/example/task.ts` 执行的完整配置, 路径均相对项目根. 安装时将命令替换为项目现有或本轮实现的 checker, 不保留示例规则冒充完整覆盖
+`assets/example/ci.json` 是能直接配合示例 `assets/example/task.ts` 执行的完整配置, 二者从当前技能根读取, 复制到目标项目后 `scripts/quality/*` 与配置中的命令路径才相对项目根. 安装时将命令替换为项目现有或本轮实现的 checker, 不保留示例规则冒充完整覆盖
 
 每个 task 包含唯一 id、command 参数数组和 format. findings 表示 stdout 必须是 `scripts/core/model.ts` 的 Finding 数组, 即使发现违规也要输出完整 JSON; exit 表示普通命令, 非零退出产生一个 Error, 日志保留在 job 输出. 不把进程异常或空 JSON 当成功
 
