@@ -40,7 +40,7 @@ metadata:
 
 ## 规范文件与路径
 
-安装时把目标项目实际生效的门禁规则精简成 `.agents/coding-rules.md`, 不超过 25 行, 只写阈值, 禁止项和自查命令, 让 AI 写代码前就知道红线而不是等门禁报错. 内容只取自已安装的 checker 配置, coverage.json 与项目已有门禁脚本/文档, 不写未实现或编造的规则, 规则或阈值变化时同次更新. 根 AGENTS.md 以单独一行 `@.agents/coding-rules.md` 导入, 不复制正文, 导入内容计入 HC-CONTEXT 与 HC-BUDGET. 起点模板为 `assets/coding-rules.md`
+安装时把目标项目实际生效的门禁规则精简成 `.agents/coding-rules.md`, 不超过 25 行, 只写阈值, 禁止项和自查命令, 让 AI 写代码前就知道红线而不是等门禁报错. 内容只取自已安装的 checker 配置, coverage.json 与项目已有门禁脚本/文档, 不写未实现或编造的规则, 规则或阈值变化时同次更新. 根 AGENTS.md 以单独一行 `@.agents/coding-rules.md` 导入, 不复制正文, 导入内容计入 HC-CONTEXT 与 HC-BUDGET. Codex 等不展开 `@` 的宿主只读到引用文本, 因此导入行上方再写一句 `写代码前先读 .agents/coding-rules.md`, 验收时在目标 Agent 实际注入的上下文或首轮读取记录中确认规范正文已加载, 只有导入行存在不算通过. 起点模板为 `assets/coding-rules.md`
 
 写入目标项目的 Agent Note 引用, `## Code` 列表, AGENTS 导入及配置中的路径一律相对项目根 (`.agents/` 所在目录) 书写, 如 `.agents/notes/implemented/process/<note>.md`. 本技能内部资源引用相对技能根书写, 如 `references/rules.md`, 从当前加载的技能目录读取, 首次在目标仓库运行时无需先 vendor. 两类路径都禁止 `./` 或 `../` 开头. 语言模块 import 与 GitHub Actions 本地 `uses` 由各自语法决定, 不在此列
 
@@ -82,7 +82,7 @@ metadata:
 
 两类文本分开约束, 不混用
 
-- 本技能目录内的文本遵守 hx-make-skill 的 `references/prose-rules.md`, 脚本遵守其 `references/code-quality.md`. hx-make-skill 按上面相同顺序查找, 修改本技能后在技能目录执行下面三条, 全部退出 0 才算完成, `<make>` 为查找到的 hx-make-skill 目录
+- 本技能目录内的文本遵守 hx-make-skill 的 `references/prose-rules.md`, 脚本遵守其 `references/code-quality.md`. hx-make-skill 按上面相同顺序查找, 修改本技能后在技能目录执行下面三条, 全部退出 0 才算完成, `<make>` 为查找到的 hx-make-skill 目录的绝对路径, 不写相对路径
 
 ```sh
 uv run <make>/scripts/validate_skill.py .

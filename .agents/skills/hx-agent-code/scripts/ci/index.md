@@ -2,11 +2,11 @@
 
 入口是 `scripts/ci.ts`, 先用 git 解析目标仓库根, 配置固定读取 scripts/quality/ci.json, 状态路径集中在 `scripts/core/constants.ts`. 安装时 vendor 整个技能, 避免拆复制后导入路径失效
 
-- `config.ts`: 校验 setup、四个检查组、impact 命令和 tests 注册表
-- `context.ts`: 从 GitHub 事件获取精确端点, PR 取 merge-base, 新分支或 force push 回退到默认分支 merge-base, 核对 checkout head
-- `run.ts`: 顺序运行独立 checker 并收集所有结果, setup 失败时记录 blocked
-- `artifact.ts`: 对本次构建输出记录源代码树和文件摘要, 测试前校验
-- `baseline.ts`: 只从可信 base tree 读取 scripts/quality/baseline.json, 不信任本次改动自批基线
+- `scripts/ci/config.ts`: 校验 setup、四个检查组、impact 命令和 tests 注册表
+- `scripts/ci/context.ts`: 从 GitHub 事件获取精确端点, PR 取 merge-base, 新分支或 force push 回退到默认分支 merge-base, 核对 checkout head
+- `scripts/ci/run.ts`: 顺序运行独立 checker 并收集所有结果, setup 失败时记录 blocked
+- `scripts/ci/artifact.ts`: 对本次构建输出记录源代码树和文件摘要, 测试前校验
+- `scripts/ci/baseline.ts`: 只从可信 base tree 读取 scripts/quality/baseline.json, 不信任本次改动自批基线
 
 ## 配置
 

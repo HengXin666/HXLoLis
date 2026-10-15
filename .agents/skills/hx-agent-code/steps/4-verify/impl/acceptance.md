@@ -1,6 +1,6 @@
 # 验收执行
 
-一次性运行 formatter check, lint, type, 自定义规则, 文档/context/notes, 项目构建和 affected 测试, 所有结果汇总后判定退出. 再运行 `references/meta.md` 规定的正反及集成探针, 这些探针由 hx-tdd 编写, 属于门禁自身的测试, 只在验收时运行, 不挂到编辑文件的 hook
+一次性运行 formatter check, lint, type, 自定义规则, 文档/context/notes, 项目构建和 affected 测试, 所有结果汇总后判定退出. 再运行 `references/meta.md` 规定的正反及集成探针, 这些探针由 hx-tdd 编写, 属于门禁自身的测试, 注册进 affected/CI 测试, 在 checker, hook, CI 配置变化时重跑防回归, 不挂到编辑文件的 hook
 
 运行 audit 校验 coverage 完整, 检查每条 checker/fixture/evidence 路径确实存在且日志来自当前最终内容. 插入违规使对应检查点失败, 再用合规输入确认恢复. 不接受仅存在配置的证据
 

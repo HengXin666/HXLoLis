@@ -2,8 +2,8 @@
 
 此示例用于证明 CI runner、真实命令、影响计划、构建产物和报告能串起来, 不是规则目录中任何一条项目规则的实现. 只有一个文本值检查和一个测试, 不用它替代目标项目适配器
 
-- `ci.json`: 复制到临时 Git 仓库的 scripts/quality/ci.json, 定义各组命令与 test ID
-- `task.ts`: 复制到临时仓库的 scripts/quality/task.ts, 执行示例 checker/build/test/graph
+- `assets/example/ci.json`: 复制到临时 Git 仓库的 scripts/quality/ci.json, 定义各组命令与 test ID
+- `assets/example/task.ts`: 复制到临时仓库的 scripts/quality/task.ts, 执行示例 checker/build/test/graph
 
 临时仓库准备 src/value.txt, 内容为 ready, 再准备 docs/guide.md. 提交基准后修改并提交, 将 before/after 完整 SHA 写入 event.json, 设置 GITHUB_EVENT_NAME=push 与 GITHUB_EVENT_PATH 为该文件绝对路径, 从临时仓库调用本技能 `scripts/ci.ts` 的 code/docs/build/compatibility/tests 分组
 

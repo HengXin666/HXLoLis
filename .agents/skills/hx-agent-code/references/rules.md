@@ -53,7 +53,7 @@
 - 不强制每个简单函数写冗余注释. 若无文档且无公开接口文档要求, HC-DOCSIG 不凭空造注释
 - HC-DOCS 中的语义要求由 HC-DOC-REVIEW 汇总, 可机械认定的问题保留 Error. HC-DIR-MIX 不能凭 AI 直觉变成阻断
 - Python 推荐不能变成强制迁移旧项目的授权. 记录存量栈, 新前端采用 React + TS 的要求不被静默豁免; 用户另有明确约束时写明差异
-- HC-PERF 的测量方法与默认预算见 `testing.md` 的性能一节; 放宽预算与 baseline 同等对待, 由元门禁从可信基准差分发现
+- HC-PERF 的测量方法与默认预算见 `references/testing.md` 的性能一节; 放宽预算与 baseline 同等对待, 由元门禁从可信基准差分发现
 - 目录豁免用 `{ "path": "src/user", "reason": "同一职责", "expires_on_change": true }`, 同时保存批准时内容摘要. 目录再次变更即失效并重新检查, 不能自动刷新摘要
 - HC-LITERAL 的计数范围, 常量目录, 阈值收紧和精确豁免登记在 scripts/quality/literals.json, 不按目录整体忽略业务代码; 阈值只能从 3 收紧. 提取后的常量定义位置 Python 由 HC-PY-CONST 约束, TS 的大写 export const 同样只在登记的常量目录定义
 - HC-LITERAL/HC-ABSPATH 的指纹使用适配器给出的稳定 anchor (如所在语句的规范化文本哈希), 缺 anchor 时退回行号, 代码移动会重新报出而不是借用旧基线
