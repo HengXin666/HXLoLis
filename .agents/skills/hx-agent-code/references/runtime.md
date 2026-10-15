@@ -7,17 +7,17 @@
 内置 helpers 是可复用算法, 不声称已为任意仓库实现全部语言 checker. 按 coverage.json 为每条适用规则完成项目适配器, 接入真实工具和 fixture, 缺任一项不交付完成. 安装方式只有一种: 固定版本 vendor 整个 skill 到目标仓库, CLI 与 CI 都从 vendor 目录运行, 不拆出 core 单独复制
 
 ```sh
-node .agents/skills/hx-agent-code/scripts/cli.ts scope --root . --mode worktree --out scripts/.hx_code_quality/cache/scope
-node .agents/skills/hx-agent-code/scripts/cli.ts scope --root . --mode staged --out scripts/.hx_code_quality/cache/index
-node .agents/skills/hx-agent-code/scripts/cli.ts scope --root . --mode range --base <sha> --head <sha> --out scripts/.hx_code_quality/cache/range
-node .agents/skills/hx-agent-code/scripts/cli.ts affected --scope scripts/.hx_code_quality/cache/scope.json --graph scripts/quality/graph.json --event local --out scripts/.hx_code_quality/cache/tests
-node .agents/skills/hx-agent-code/scripts/cli.ts report --input scripts/.hx_code_quality/cache/findings.json --baseline scripts/quality/baseline.json --out scripts/.hx_code_quality/reports/review
-node .agents/skills/hx-agent-code/scripts/cli.ts audit --manifest scripts/quality/coverage.json --out scripts/.hx_code_quality/reports/audit
-node .agents/skills/hx-agent-code/scripts/cli.ts literals --tokens scripts/.hx_code_quality/cache/tokens.json --config scripts/quality/literals.json --out scripts/.hx_code_quality/reports/literals
-node .agents/skills/hx-agent-code/scripts/cli.ts abspath --tokens scripts/.hx_code_quality/cache/tokens.json --out scripts/.hx_code_quality/reports/abspath
+node <skill>/scripts/cli.ts scope --root . --mode worktree --out scripts/.hx_code_quality/cache/scope
+node <skill>/scripts/cli.ts scope --root . --mode staged --out scripts/.hx_code_quality/cache/index
+node <skill>/scripts/cli.ts scope --root . --mode range --base <sha> --head <sha> --out scripts/.hx_code_quality/cache/range
+node <skill>/scripts/cli.ts affected --scope scripts/.hx_code_quality/cache/scope.json --graph scripts/quality/graph.json --event local --out scripts/.hx_code_quality/cache/tests
+node <skill>/scripts/cli.ts report --input scripts/.hx_code_quality/cache/findings.json --baseline scripts/quality/baseline.json --out scripts/.hx_code_quality/reports/review
+node <skill>/scripts/cli.ts audit --manifest scripts/quality/coverage.json --out scripts/.hx_code_quality/reports/audit
+node <skill>/scripts/cli.ts literals --tokens scripts/.hx_code_quality/cache/tokens.json --config scripts/quality/literals.json --out scripts/.hx_code_quality/reports/literals
+node <skill>/scripts/cli.ts abspath --tokens scripts/.hx_code_quality/cache/tokens.json --out scripts/.hx_code_quality/reports/abspath
 ```
 
-所有子命令的 `--out` 都是不带扩展名的前缀, scope/affected 写 `<out>.json`, 其余写 `<out>.json` 与 `<out>.md`. 失败时先删除旧的同名输出, 再在同一前缀写入 tool-error 报告, 下游读到的不会是上一轮范围. 未给 `--out` 时报告写到仓库根解析出的 `scripts/.hx_code_quality/reports/cli-error`. report, audit, literals, abspath 有 Error 返回 1, 输入/工具错误返回 2, 只有 Warning 返回 0. 未知选项拒绝. scope/affected 不执行测试. 具体 JSON 类型见 `.agents/skills/hx-agent-code/scripts/core/model.ts`, 示例见 `.agents/skills/hx-agent-code/assets/impact.example.json` 和 `.agents/skills/hx-agent-code/assets/coverage.example.json`
+所有子命令的 `--out` 都是不带扩展名的前缀, scope/affected 写 `<out>.json`, 其余写 `<out>.json` 与 `<out>.md`. 失败时先删除旧的同名输出, 再在同一前缀写入 tool-error 报告, 下游读到的不会是上一轮范围. 未给 `--out` 时报告写到仓库根解析出的 `scripts/.hx_code_quality/reports/cli-error`. report, audit, literals, abspath 有 Error 返回 1, 输入/工具错误返回 2, 只有 Warning 返回 0. 未知选项拒绝. scope/affected 不执行测试. 具体 JSON 类型见 `scripts/core/model.ts`, 示例见 `assets/impact.example.json` 和 `assets/coverage.example.json`
 
 ## 快照语义
 

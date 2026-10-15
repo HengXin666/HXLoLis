@@ -8,4 +8,4 @@ pre-push 读取 Git 提供的每个 local/remote ref 与 SHA, 多 ref 分别计�
 
 post-commit 从该 commit 路径清理格式缓存, 剩余未提交内容仍重新 hash. 把 `scripts/.hx_code_quality/` 整个目录加入目标 gitignore 的标记区, 幂等更新且不覆盖其他行
 
-GitHub 项目完整执行 `.agents/skills/hx-agent-code/references/github.md`, 非 GitHub 项目对 HC-CI/HC-COLLAB 记录可验证的不适用理由. workflow 与协作文件先在本地完成, 发布评论/修改远程权限另按已有授权执行
+GitHub 项目完整执行 `references/github.md`, 非 GitHub 项目对 HC-CI/HC-COLLAB 记录可验证的不适用理由. workflow 与协作文件先在本地完成, 发布评论/修改远程权限另按已有授权执行

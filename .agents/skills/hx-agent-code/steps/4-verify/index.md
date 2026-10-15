@@ -6,4 +6,4 @@
 
 通过条件是所有适用规则的证据闭合, 元门禁验证删规则/脱线会红, 本地检查及构建测试成功, 未发生需阻断的未解决 Error. 远程未执行只能报告本地验证完成, 不能宣称 CI 已验证
 
-- `.agents/skills/hx-agent-code/steps/4-verify/impl/acceptance.md`: 收尾验证与交付时读
+- `impl/acceptance.md`: 收尾验证与交付时读

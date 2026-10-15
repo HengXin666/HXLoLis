@@ -6,5 +6,5 @@
 
 通过条件是所有适用规则都有独立可调用 checker, 缺命令会失败, Warning/Error 输出 MD/JSON, 测试选择能保守兜底. 本步骤完成代码后交第 4 步统一测试, 不在开发中逐条反复跑测试
 
-- `.agents/skills/hx-agent-code/steps/2-install/impl/checkers.md`: 选择解析器及实现语言规则时读
-- `.agents/skills/hx-agent-code/steps/2-install/impl/context.md`: 实现文档、上下文和 notes 检查时读
+- `impl/checkers.md`: 选择解析器及实现语言规则时读
+- `impl/context.md`: 实现文档、上下文和 notes 检查时读
