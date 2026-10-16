@@ -17,11 +17,14 @@ metadata:
 
 | 步骤 | 只负责 | 契约 |
 |---|---|---|
-| 接缝 | 读项目约定, 列出待测接缝并一次确认 | `steps/1-seams/index.md`: 开始时读 |
-| 循环 | 每轮一条失败测试加最小实现 | `steps/2-loop/index.md`: 写第一条测试前读 |
-| 交付 | 登记测试 ID, 末轮统一运行一次, 报告 | `steps/3-deliver/index.md`: 所有切片变绿后读 |
+| 安装 | 把项目测试约定写进根 AGENTS.md 的 hx-tdd 段 | `steps/1-setup/index.md`: 开始时读, 段已存在且一致则跳过 |
+| 接缝 | 列出待测接缝并一次确认 | `steps/2-seams/index.md`: 安装后读 |
+| 循环 | 每轮一条失败测试加最小实现 | `steps/3-loop/index.md`: 写第一条测试前读 |
+| 交付 | 登记测试 ID, 末轮统一运行一次, 报告 | `steps/4-deliver/index.md`: 所有切片变绿后读 |
 
 ## 与本仓规范的边界
+
+- 项目约定: 测试目录, runner, 单条与 affected 命令和登记位置由安装步骤写进根 AGENTS.md 的 `<!-- hx-tdd:start -->` 段, 随 AGENTS.md 每次会话注入, 本技能各步骤直接引用该段, 不在每次调用时重新探测. 模板见 `assets/agents-section.md`
 
 - 运行时机: 红绿循环中只运行当前这一条测试, 这是 "禁止一边开发一边测试" 的唯一例外, 因为先红后绿本身就是这一轮的证据. affected 测试, formatter, lint 与 notes 门禁都在交付步骤按最终 diff 统一跑一次, 完整测试集只在 affected 选择兜底全量时或 PR CI 中运行, 不挂到编辑文件的 hook
 - 测试布局: 以目标项目存在 `scripts/quality/coverage.json` 作为已装 hx-agent-code 的唯一判据, 各步骤同用此判据. 已装时, 用例按它的业务分层目录, 统一入口与影响图落地; 未安装时沿用项目已有测试目录, runner 与检查入口, 不新建测试框架, 入口或新增依赖
