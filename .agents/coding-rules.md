@@ -17,6 +17,6 @@
 约定, 尚无自动 checker
 - hx-agent-code 的 scripts 只写 `.ts`, 不写 `.js` `.mjs` `.cjs`; 其他技能沿用各自已有语言, Python 经 uv 执行
 - 修改 hx-code-quality 的决策记录交接时, SKILL.md 与对应 note 的 Decision 必须互相引用
-- 默认不编写测试, 测试由 hx-tdd 负责, hx-agent-code 只负责规范与门禁
+- 默认不编写测试, 只在调用 hx-tdd 时按约定接缝以红绿循环编写, hx-agent-code 只负责规范与门禁
 
 自查: `uv run scripts/redlines/agent_notes.py --diff`, 提交前加 `--staged`; 改技能后运行 hx-make-skill 的 validate_skill, prose_rules --check, check_layout
