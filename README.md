@@ -56,3 +56,19 @@ git commit -m "update private notes"
 ```
 
 在 `HXLoLis` 根目录执行 `git add .` 只会提交总览库自己的文件, 例如本 README 和 `.gitignore`; 不会替你把 `HXLoLi`、`HXLoLi-imouto` 等子仓库内部修改提交掉。
+
+## 技能同步
+
+`.agents/skills` 下的本仓技能会被其他仓库按固定版本 vendor. 为了让这些仓库跟上更新:
+
+- 改技能内容时同次提高 `SKILL.md` 的 `metadata.version`, PR CI 会检查. 需要使用方重新生成产物时, 在技能的 `references/upgrade.md` 按 `## <版本>` 写明
+- main 上技能变动后 (以及每周一次), `Skills Fanout` 工作流扫描仓库所有者名下的全部仓库, 对 vendor 了同名技能的仓库逐个提同步 PR. 需要在本仓配置 secret `HX_SKILLS_TOKEN` (对这些仓库有 Contents 与 Pull requests 写权限的 fine-grained token), 并在 Actions 里手动运行一次 dry-run 确认范围
+- 使用方也可以手动检查与升级:
+
+```bash
+uv run https://raw.githubusercontent.com/HengXin666/HXLoLis/main/scripts/skills/sync.py adopt    # 首次: 为已 vendor 的技能建锁
+uv run https://raw.githubusercontent.com/HengXin666/HXLoLis/main/scripts/skills/sync.py check
+uv run https://raw.githubusercontent.com/HengXin666/HXLoLis/main/scripts/skills/sync.py update [<skill>]
+```
+
+本地改过的技能不会被覆盖, 需人工合并后加 `--force`. 升级后照常手动运行 lint 与 notes 门禁
