@@ -1,0 +1,6 @@
+interface:
+  display_name: "HX TDD"
+  short_description: "按约定接缝以红绿循环编写测试, 承接 hx-agent-code 登记的用例"
+  default_prompt: "使用 $hx-tdd 为当前任务确认测试接缝并以红绿循环完成实现"
+policy:
+  allow_implicit_invocation: false
