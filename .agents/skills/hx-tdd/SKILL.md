@@ -23,8 +23,8 @@ metadata:
 
 ## 与本仓规范的边界
 
-- 运行时机: 红绿循环中只运行当前这一条测试, 这是 "禁止一边开发一边测试" 的唯一例外, 因为先红后绿本身就是这一轮的证据. 完整测试集, affected 选择, formatter, lint 与 notes 门禁都在交付步骤统一跑一次, 不挂到编辑文件的 hook
-- 测试布局: 目标项目已装 hx-agent-code (存在 `scripts/quality/coverage.json`) 时, 用例按它的业务分层目录, 统一入口与影响图落地; 未安装时沿用项目已有测试目录和 runner, 不新建测试框架, 入口或新增依赖
+- 运行时机: 红绿循环中只运行当前这一条测试, 这是 "禁止一边开发一边测试" 的唯一例外, 因为先红后绿本身就是这一轮的证据. affected 测试, formatter, lint 与 notes 门禁都在交付步骤按最终 diff 统一跑一次, 完整测试集只在 affected 选择兜底全量时或 PR CI 中运行, 不挂到编辑文件的 hook
+- 测试布局: 以目标项目存在 `scripts/quality/coverage.json` 作为已装 hx-agent-code 的唯一判据, 各步骤同用此判据. 已装时, 用例按它的业务分层目录, 统一入口与影响图落地; 未安装时沿用项目已有测试目录, runner 与检查入口, 不新建测试框架, 入口或新增依赖
 - 确认次数: 全程最多在接缝步骤确认一次. 承接 hx-agent-code 登记清单时清单即为已授权接缝, 不再询问, 清单外新出现的接缝标 blocked 并在交付时列出
 - 决策记录: 改动带 Agent Note 锚点的声明前先读该 note, 按 hx-agent-notes 的规则在同一 diff 配对修改. 本技能不为测试另立 note
 - 依赖查找: hx-agent-code 与 hx-agent-notes 按顺序查找第一个 `SKILL.md` 可读的安装, 悬空 symlink 不算: 本技能同级目录, 目标仓库 `.agents/skills` 或 `.dsh/skills`, 用户级 `~/.dsh/skills`, `~/.agents/skills` 或 `${CODEX_HOME:-~/.codex}/skills`
