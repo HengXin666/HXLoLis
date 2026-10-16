@@ -4,7 +4,7 @@ description: "为目标项目一次性安装和补齐代码质量红线与精简
 disable-model-invocation: true
 metadata:
   author: Heng_Xin
-  version: "1.1"
+  version: "1.2"
 ---
 
 # hx-agent-code
@@ -15,7 +15,7 @@ metadata:
 
 运行期依赖 hx-agent-notes, 负责决策记录、AST 锚点、双链和配对 diff, 开始非平凡改动前读取它的 SKILL.md. 按顺序查找第一个 `SKILL.md` 可读的安装, 悬空 symlink 不算: 本技能同级目录, 目标仓库 `.agents/skills` 或 `.dsh/skills`, 用户级 `~/.dsh/skills`, `~/.agents/skills` 或 `${CODEX_HOME:-~/.codex}/skills`. 全部缺失时把安装方案并入下面的集中确认, 其余已授权工作照常推进, 不复制其实现来假装依赖已满足. hx-make-skill 只在维护本技能时需要, 见产物约束
 
-本技能只负责规范与门禁, 默认不编写任何测试. 业务分层测试, 性能案例, 契约测试与规则正反探针由 hx-tdd 编写, 按上面相同顺序查找. 本技能只登记所需用例, 测试层, 选择规则与验收判据, 并在回合结束和验收时运行已有测试; 缺 hx-tdd 时列出所需用例并标 blocked, 只有用户明确要求才由本技能补写
+本技能只负责规范与门禁, 默认不编写任何测试. 测试不是每次编码后的必做项, 普通编码任务只在回合结束运行已有的 affected 测试, 不补写新测试. 业务分层测试, 性能案例, 契约测试与规则正反探针交 hx-tdd 以红绿循环编写, 按上面相同顺序查找, 需要用例时读取它的 SKILL.md 并从其步骤开始. 本技能只登记所需用例, 测试层, 选择规则与验收判据, 字段按 hx-tdd 技能根下 references/handoff.md 填写; 登记清单即 hx-tdd 已授权的接缝, 不另设确认点. hx-tdd 回交的规则探针正例与反例路径分别写入 coverage.json 对应规则的 `probes.positive` 与 `probes.negative`, 测试 ID 只登记在影响图与 ci.json 的 tests 注册表, 红绿记录只作参考, evidence 仍取验收时对最终内容的运行输出. 缺 hx-tdd 时列出所需用例并标 blocked, 安装方案并入下面的集中确认, 只有用户明确要求才由本技能补写
 
 全程最多一次集中确认: 取证结束后把需授权的依赖、技术栈、超出范围的架构变更、缺失依赖技能的安装一次列出, 已有授权的项不再询问. 步骤 2 到 4 不再新增确认点, 新出现的未授权选择标 blocked 并在交付时列出
 
@@ -40,7 +40,7 @@ metadata:
 
 ## 规范文件与路径
 
-安装时把目标项目实际生效的门禁规则精简成 `.agents/coding-rules.md`, 不超过 25 行, 只写阈值, 禁止项和自查命令, 让 AI 写代码前就知道红线而不是等门禁报错. 内容只取自已安装的 checker 配置, coverage.json 与项目已有门禁脚本/文档, 不写未实现或编造的规则, 规则或阈值变化时同次更新. 根 AGENTS.md 以单独一行 `@.agents/coding-rules.md` 导入, 不复制正文, 导入内容计入 HC-CONTEXT 与 HC-BUDGET. Codex 等不展开 `@` 的宿主只读到引用文本, 因此导入行上方再写一句 `写代码前先读 .agents/coding-rules.md`, 验收时在目标 Agent 实际注入的上下文或首轮读取记录中确认规范正文已加载, 只有导入行存在不算通过. 起点模板为 `assets/coding-rules.md`
+安装时把目标项目实际生效的门禁规则精简成 `.agents/coding-rules.md`, 不超过 25 行, 只写阈值, 禁止项和自查命令, 让 AI 写代码前就知道红线而不是等门禁报错. 内容只取自已安装的 checker 配置, coverage.json 与项目已有门禁脚本/文档, 不写未实现或编造的规则, 规则或阈值变化时同次更新. 根 AGENTS.md 以单独一行 `@.agents/coding-rules.md` 导入, 不复制正文, 导入内容计入 HC-CONTEXT 与 HC-BUDGET. 验收时在目标 Agent 实际注入的上下文或首轮读取记录中确认规范正文已加载, 只有导入行存在不算通过. 起点模板为 `assets/coding-rules.md`
 
 写入目标项目的 Agent Note 引用, `## Code` 列表, AGENTS 导入及配置中的路径一律相对项目根 (`.agents/` 所在目录) 书写, 如 `.agents/notes/implemented/process/<note>.md`. 本技能内部资源引用相对技能根书写, 如 `references/rules.md`, 从当前加载的技能目录读取, 首次在目标仓库运行时无需先 vendor. 两类路径都禁止 `./` 或 `../` 开头. 语言模块 import 与 GitHub Actions 本地 `uses` 由各自语法决定, 不在此列
 
@@ -48,7 +48,7 @@ metadata:
 
 - `references/rules.md`: 安装前逐项读取的规则 ID、等级、阈值及正反例
 - `references/runtime.md`: 实现本地检查点、快照适配、缓存、MD/JSON、输出展示与 baseline 时读
-- `references/testing.md`: 登记业务模块测试层、依赖影响图和统一入口时读, 用例交 hx-tdd 编写
+- `references/testing.md`: 登记业务模块测试层、依赖影响图和统一入口时读, 用例按登记清单交 hx-tdd 编写
 - `references/github.md`: 项目使用 GitHub 时读, 覆盖工作流、可选 bot 与协作文件
 - `references/meta.md`: 登记规则探针要求及最终交付验收时读
 - `references/source-map.md`: 维护技能或对照原文时读, 核查章节覆盖与验证边界
