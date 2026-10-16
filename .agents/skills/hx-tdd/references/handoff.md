@@ -6,12 +6,12 @@ hx-agent-code 只登记所需用例, 由本技能编写. 清单即已授权接�
 
 | 字段 | 内容 |
 |---|---|
-| id | 稳定用例 ID, 与 affected 选择和 coverage.json 引用一致 |
+| id | 稳定用例 ID, 与影响图模块测试列表和 `scripts/quality/ci.json` 的 tests 注册表一致 |
 | source | 规则 ID, 性能预算 ID, 契约端点, 或业务模块与已确认接缝 (普通分层用例) |
 | layer | hx-agent-code 测试层或 meta 探针 |
 | seam | 被测入口: 单 ID 运行的 checker 命令, 端点, 页面路由 |
 | criteria | 规则探针写正反例各自的期望 finding, 等级与退出码; 业务用例写主路径与失败路径的期望行为 |
-| fixture | 计划的 fixture 或数据集路径, 相对项目根书写 |
+| fixture | 计划的 fixture 或数据集路径, 相对项目根书写; 规则探针分别给出正例与反例路径 |
 
 缺字段时按 hx-agent-code 的规则目录与测试契约补全, 无法补全的项标 blocked, 不自行猜测判据
 
@@ -32,4 +32,4 @@ hx-agent-code 只登记所需用例, 由本技能编写. 清单即已授权接�
 
 ## 回交
 
-每项回交测试 ID, 测试文件与 fixture 路径, 红绿记录 (命令与结果摘要). hx-agent-code 把测试 ID 与路径写入 coverage.json 的 fixture, 红绿记录只作编写过程的参考, evidence 取交付验收时对最终内容的运行输出. 无法编写的项回交 blocked 与原因, 由 hx-agent-code 在交付时列出
+每项回交测试 ID, 测试文件与 fixture 路径, 红绿记录 (命令与结果摘要). 规则探针的正例与反例路径由 hx-agent-code 分别写入 coverage.json 对应规则的 `probes.positive` 与 `probes.negative`, 测试 ID 只登记在影响图与 ci.json 的 tests 注册表, 不写入 coverage.json. 红绿记录只作编写过程的参考, evidence 取交付验收时对最终内容的运行输出. 无法编写的项回交 blocked 与原因, 由 hx-agent-code 在交付时列出

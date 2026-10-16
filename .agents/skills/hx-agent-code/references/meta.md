@@ -22,6 +22,6 @@
 
 不复用当前 registry 作为唯一期望清单, 否则删规则后实际与期望一起变少. 用已提交规则目录, 可信 base 快照和逐项 coverage 审核变更. 新规范升级同步 probes 和 note
 
-skill 自带 core helper 测试只验证 scope/selection/report/audit, 不冒充项目 checker 测试. 安装后项目每条规则的真实探针由 hx-tdd 编写, 本技能只按其登记清单字段登记探针要求并验证 hook/CI 接线, 回交的探针路径作为 coverage.json 的 fixture, 红绿记录只作参考, evidence 取本次验收对最终内容的运行输出, 缺 hx-tdd 时探针标 blocked
+skill 自带 core helper 测试只验证 scope/selection/report/audit, 不冒充项目 checker 测试. 安装后项目每条规则的真实探针由 hx-tdd 编写, 本技能只按其登记清单字段登记探针要求并验证 hook/CI 接线, 回交的正例与反例探针路径分别写入 coverage.json 对应规则的 probes.positive 与 probes.negative, 红绿记录只作参考, evidence 取本次验收对最终内容的运行输出, 缺 hx-tdd 时探针标 blocked
 
 交付报告给出生效命令, 覆盖表, MD/JSON 问题报告, 已跑测试, 未解决 blocked, 远程是否实际执行. blocked 不算成功, 不为追求绿灯自动删掉适用要求
