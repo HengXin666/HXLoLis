@@ -6,6 +6,7 @@
 import argparse
 import hashlib
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -43,6 +44,7 @@ def tree_hash(skill: Path) -> str:
     digest = hashlib.sha256()
     for path in sorted(p for p in skill.rglob("*") if p.is_file()):
         digest.update(path.relative_to(skill).as_posix().encode() + b"\0")
+        digest.update((b"x" if os.access(path, os.X_OK) else b"-") + b"\0")
         digest.update(path.read_bytes() + b"\0")
     return digest.hexdigest()
 
@@ -119,10 +121,12 @@ def apply(root: Path, source_root: Path, rows: list[dict], source: str, ref: str
         blocked = row["modified"] or row["status"] == "diverged"
         if row["status"] == "current":
             dst = root / SKILLS / row["skill"]
-            lock["skills"].setdefault(row["skill"], {
-                "source": source, "ref": ref, "commit": commit,
-                "version": row["want"], "hash": tree_hash(dst),
-            })
+            entry = lock["skills"].get(row["skill"], {})
+            if entry.get("hash") != tree_hash(dst) or entry.get("version") != row["want"]:
+                lock["skills"][row["skill"]] = {
+                    "source": source, "ref": ref, "commit": commit,
+                    "version": row["want"], "hash": tree_hash(dst),
+                }
             continue
         if blocked and not force:
             continue
@@ -153,27 +157,61 @@ def adopt(root: Path, names: list[str], source: str, ref: str) -> None:
     write_lock(root, lock)
 
 
-def version_check(root: Path, base: str) -> int:
+def version_issues(root: Path, base: str) -> tuple[list[str], list[dict]]:
     changed = git("diff", "--name-only", f"{base}...HEAD", "--", str(SKILLS), cwd=root).splitlines()
-    errors = 0
-    for name in sorted({Path(p).parts[2] for p in changed if len(Path(p).parts) > 3}):
+    names = sorted({Path(p).parts[2] for p in changed if len(Path(p).parts) > 3})
+    issues = []
+    for name in names:
         skill = root / SKILLS / name
-        if skill.is_symlink() or not (skill / "SKILL.md").is_file():
+        if skill.is_symlink() or not skill.is_dir():
             continue
         try:
             old_text = git("show", f"{base}:{SKILLS / name / 'SKILL.md'}", cwd=root)
         except subprocess.CalledProcessError:
+            old_text = None
+        if not (skill / "SKILL.md").is_file():
+            if old_text is not None:
+                issues.append({"skill": name, "rule": "skill-md-missing", "message": "SKILL.md 被删除或改名, 无法判断版本"})
+            continue
+        new = skill_version(skill)
+        if new == "0":
+            issues.append({"skill": name, "rule": "version-missing", "message": "SKILL.md 缺 metadata.version, 下游无法判断是否需要升级"})
+            continue
+        if old_text is None:
             continue
         with tempfile.TemporaryDirectory() as tmp:
             (Path(tmp) / "SKILL.md").write_text(old_text, encoding="utf-8")
             old = skill_version(Path(tmp))
-        new = skill_version(skill)
-        if new == "0":
-            print(f"WARNING {name}: SKILL.md 缺 metadata.version, 下游无法判断是否需要升级")
-        elif version_key(new) <= version_key(old):
-            print(f"ERROR {name}: 技能内容已改动, metadata.version 仍为 {new}, 需高于 {old}")
-            errors += 1
-    return 1 if errors else 0
+        if version_key(new) <= version_key(old):
+            issues.append({"skill": name, "rule": "version-not-bumped", "message": f"技能内容已改动, metadata.version 仍为 {new}, 需高于 {old}"})
+    return names, issues
+
+
+def version_check(root: Path, base: str, report: Path) -> int:
+    try:
+        names, issues = version_issues(root, base)
+        result = {"ok": not issues, "base": base, "checked": names, "issues": issues}
+    except (OSError, subprocess.CalledProcessError) as err:
+        result = {"ok": False, "base": base, "tool_error": str(err)}
+    try:
+        report.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    except OSError as err:
+        print(f"ERROR 报告写入失败 {report}: {err}")
+        return 2
+    if "tool_error" in result:
+        print(f"ERROR 版本检查工具故障, 完整报告 {report}")
+        return 2
+    issues = result["issues"]
+    print(f"检查 {len(names)} 个改动技能, 问题 {len(issues)} 条, 完整报告 {report}")
+    if len(issues) > 10:
+        counts = {}
+        for issue in issues:
+            counts[issue["rule"]] = counts.get(issue["rule"], 0) + 1
+        print("  " + ", ".join(f"{k} {v}" for k, v in sorted(counts.items())))
+    else:
+        for issue in issues:
+            print(f"ERROR {issue['skill']}: {issue['message']}")
+    return 1 if issues else 0
 
 
 def describe(row: dict) -> str:
@@ -211,6 +249,7 @@ def main() -> int:
     parser.add_argument("--source-dir", help="使用本地上游检出, 不克隆")
     parser.add_argument("--base", default="origin/main", help="version-check 的比较基准")
     parser.add_argument("--force", action="store_true", help="覆盖本地改动过的技能")
+    parser.add_argument("--report", default="skills-version-report.json", help="version-check 的完整 JSON 报告路径")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
     root = repo_root(Path(args.repo))
@@ -218,7 +257,7 @@ def main() -> int:
         print(json.dumps(manifest(root), ensure_ascii=False, indent=2))
         return 0
     if args.command == "version-check":
-        return version_check(root, args.base)
+        return version_check(root, args.base, Path(args.report))
     if args.command == "adopt":
         names = args.skills or sorted(p.name for p in (root / SKILLS).iterdir() if (p / "SKILL.md").is_file())
         adopt(root, names, args.source, args.ref)
