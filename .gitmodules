@@ -22,3 +22,9 @@
 [submodule "HXLoLi-imouto"]
 	path = HXLoLi-imouto
 	url = https://github.com/HengXin666/HXLoLi-imouto.git
+[submodule "components/HX-AI-Review"]
+	path = components/HX-AI-Review
+	url = https://github.com/HengXin666/HX-AI-Review.git
+[submodule "utils/HX-DataLock"]
+	path = utils/HX-DataLock
+	url = https://github.com/HengXin666/HX-DataLock.git

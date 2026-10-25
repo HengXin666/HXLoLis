@@ -4,3 +4,4 @@ ref/
 scripts/.hx_code_quality/
 __pycache__/
 *.pyc
+node_modules
